@@ -1,5 +1,3 @@
-'''
 from . import user
-from . import job
-from . import department
-'''
+from . import message
+from . import chat
