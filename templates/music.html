@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block links %}
+<link rel="stylesheet" href="../static/css/music.css">
+{% endblock %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+  <input type="text" name="name_music">
+  <button type="submit" class="btn btn-primary">Записаться</button>
+</form>
+{% endblock %}

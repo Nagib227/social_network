@@ -9,11 +9,13 @@ from data.user import User
 from data.message import Message
 from data.chat import Chat
 
+from data.music import find_music
+
 from forms.register import RegisterUserForm
 from forms.login import LoginUserForm
- 
 
-CUR_USER = None
+import vlc
+
 
 app = Flask(__name__)
 api = Api(app)
@@ -94,6 +96,18 @@ def login():
                                form=form)
     return render_template('login.html', title='Авторизация', form=form)
 # current_user
+
+@app.route('/music', methods=['GET', 'POST'])
+def music():
+    print(request.method)
+    if request.method == "POST":
+        print(request.form["name_music"])
+        # login
+        # password
+        find_music(login="", password="", q=request.form["name_music"])
+        p = vlc.MediaPlayer("file:///music/wav/temp.wav")
+        p.play()
+    return render_template('music.html')
 
 if __name__ == '__main__':
     main()
