@@ -34,7 +34,7 @@ class M3U8Downloader:
         with open(f'music/segments/temp.ts', 'wb') as f:
             f.write(segments)
         os.system('bin\\ffmpeg.exe -y -i "music/segments/temp.ts" -vcodec copy -acodec copy -vbsf h264_mp4toannexb "music/wav/temp.wav"')
-        # os.remove("music/segments/temp.ts")
+        os.remove("music/segments/temp.ts")
 
     def _get_audio_url(self, q: str):
         self._vk_audio.get_albums_iter()
