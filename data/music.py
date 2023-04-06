@@ -33,9 +33,6 @@ class M3U8Downloader:
     def _convert_ts_to_mp3(segments: bytes):
         with open(f'music/segments/temp.ts', 'wb') as f:
             f.write(segments)
-        # proc = subprocess.Popen('cmd.exe', stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        # proc.communicate('ffmpeg -i "music/segments/temp.ts" -vcodec copy -acodec copy -vbsf h264_mp4toannexb "music/wav/temp.wav"')
-        # os.system(f"cd C:\\Users\\Артем\\PycharmProjects\\test")
         os.system('bin\\ffmpeg.exe -y -i "music/segments/temp.ts" -vcodec copy -acodec copy -vbsf h264_mp4toannexb "music/wav/temp.wav"')
         # os.remove("music/segments/temp.ts")
 

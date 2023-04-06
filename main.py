@@ -44,6 +44,8 @@ def main():
 
 @app.route('/')
 def index():
+    if not current_user.is_authenticated:
+        return redirect('/login')
     return render_template('index.html', link_logo=url_for('static', filename='img/logo.png'))
 
 
@@ -92,6 +94,7 @@ def login():
             print(current_user) # зарегистрированный user # current_user
             return redirect(f"/")
         return render_template('login.html',
+                               title='Авторизация',
                                message="Неправильный логин или пароль",
                                form=form)
     return render_template('login.html', title='Авторизация', form=form)
