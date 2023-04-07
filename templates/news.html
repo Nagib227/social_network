@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% set news = [{"title": "1", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "1", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "1", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "1", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "1", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}] %}
+    {% for item in news %}
+        <h2>{{item["title"]}}</h2>
+        <div>{{item["content"]}}</div><br>
+    {% endfor %}
+{% endblock %}

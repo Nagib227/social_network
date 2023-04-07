@@ -1,0 +1,59 @@
+body{
+    padding: 0px;
+}
+
+.block{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.block_1{
+    padding-left: 3%;
+    padding-top: 40px;
+    background-color: #ece89d;
+    border: 5px solid blue;
+    display: inline-block;
+    position: fixed;
+    top: 130px;
+    left: 9.5%;
+    width: 15%;
+    height: 300px;
+}
+
+.block_main{
+    padding: 5px;
+    border: 5px solid green;
+    display: inline-block;
+    position: relative;
+    top: 130px;
+    width: 50%;
+    left: 25%;
+}
+
+.block_weather{
+    padding: 5px;
+    border: 5px solid yellow;
+    position: fixed;
+    top: 130px;
+    right: 0px;
+    width: 24.5%;
+}
+
+.music{
+    padding: 5px;
+    border: 5px solid blue;
+    position: fixed;
+    left: 9.5%;
+    width: 15%;
+    top: 450px;
+    height: 100px;
+}
+
+.navbar{
+    position: fixed;
+    top:0;
+    left:0;
+    width: 100%;
+    z-index: 10;
+}

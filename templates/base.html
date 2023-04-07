@@ -7,13 +7,49 @@
           href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
           crossorigin="anonymous">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300&family=Ubuntu:ital@1&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="static/css/header.css">
+    <link rel="stylesheet" href="static/css/base.css">
     <link rel="icon" href="../data/img/icon.png">
-    {% block links %}{% endblock %}
-    <title>{{ title }}</title>
+    <title>пример</title>
 </head>
 <body>
-<main role="main" class="container">
-    {% block content %}{% endblock %}
-</main>
+<!-- Begin page content -->
+<header>
+    <div class="logo">
+        <img src="static/img/logo.png" alt="logo">
+    </div>
+    <div class="pages">
+        <a href="#">main</a>
+        <a href="#">page №2</a>
+        <a href="#">page №3</a>
+    </div>
+    <div class="btns"></div>
+</header>
+
+<div class="block">
+    <div class="block_1">
+        <a href="main/{{mail}}"><h5>Мой профиль</h5></a><br>
+        <a href="news"><h5>Новости</h5></a><br>
+        <a href="messages"><h5>Сообщения</h5></a><br>
+        <a href="friends"><h5>Друзья</h5></a><br>
+    </div>
+    <div class="block_main">
+        <main role="main" class="container">
+            <h4 align="center">Main block</h4>
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+    <div class="block_weather">
+        <h6 align="center">Weather</h6>
+    </div>
+    <div class="music">
+        <h6 align="center">music</h6>
+    </div>
+</div>
 </body>
 </html>

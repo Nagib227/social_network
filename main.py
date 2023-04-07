@@ -42,9 +42,9 @@ def main():
     app.run()
 
 
-@app.route('/')
-def index():
-    return render_template('index.html', link_logo=url_for('static', filename='img/logo.png'))
+@app.route('/news')
+def news():
+    return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'))
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -82,7 +82,6 @@ def load_user(user_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    global CUR_USER
     form = LoginUserForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
@@ -108,6 +107,7 @@ def music():
         p = vlc.MediaPlayer("file:///music/wav/temp.wav")
         p.play()
     return render_template('music.html')
+
 
 if __name__ == '__main__':
     main()
