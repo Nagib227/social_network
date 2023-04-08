@@ -44,6 +44,8 @@ def main():
 
 @app.route('/news')
 def news():
+    if not current_user.is_authenticated:
+        return redirect('/login')
     return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'))
 
 
@@ -82,6 +84,7 @@ def load_user(user_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    global CUR_USER
     form = LoginUserForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
@@ -91,6 +94,7 @@ def login():
             print(current_user) # зарегистрированный user # current_user
             return redirect(f"/")
         return render_template('login.html',
+                               title='Авторизация',
                                message="Неправильный логин или пароль",
                                form=form)
     return render_template('login.html', title='Авторизация', form=form)
