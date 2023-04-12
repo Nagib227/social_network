@@ -1,8 +1,7 @@
 body{
     padding: 0px;
+    background-color: #F5E9CD;
 }
-
-input {outline:none;}
 
 .block{
     position: relative;
@@ -13,78 +12,36 @@ input {outline:none;}
 .block_1{
     padding-left: 3%;
     padding-top: 40px;
-    background-color: #ece89d;
-    border: 5px solid blue;
+    background-color: #EDDDBA;
+    border: 2px solid #BD9A7A;
     display: inline-block;
     position: fixed;
-    top: 130px;
-    left: 9.5%;
+    top: 140px;
+    left: 14.5%;
     width: 15%;
     height: 300px;
 }
 
 .block_main{
+    margin-top: 10px;
     padding: 5px;
-    border: 5px solid green;
-    display: inline-block;
+    background-color: #f2dca7;
+    border: 2px solid #BD9A7A;
     position: relative;
     top: 130px;
-    width: 50%;
-    left: 25%;
-}
-
-.block_weather{
-    padding: 5px;
-    border: 5px solid yellow;
-    position: fixed;
-    top: 130px;
-    right: 0px;
-    width: 24.5%;
+    width: 40%;
+    left: 30%;
 }
 
 .music{
     padding: 5px;
-    border: 5px solid blue;
+    border: 2px solid #BD9A7A;
+    background-color: #EDDDBA;
     position: fixed;
-    left: 9.5%;
+    left: 14.5%;
     width: 15%;
     top: 450px;
-}
-
-.music .search {
-  display: inline-flex;
-  max-width: 100%;
-  border: 1px solid black;
-  border-radius: 7px;
-}
-
-.music .search .input_music {
-  outline: none;
-  border: 0px;
-}
-
-.music .search .input_music:focus {
-  -webkit-box-shadow: none;
-}
-
-.music .search .btn_search {
-  background-image: url(../img/search.png);
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: 40px 40px;
-  padding: 0;
-  width: 50px;
-  height: 40px;
-}
-
-.music .search .btn_search:focus {
-  -webkit-box-shadow: none;
-}
-
-.music .search .btn_search img {
-
-  max-width: 40px;
-  max-height: 40px;
+    height: 100px;
 }
 
 .navbar{

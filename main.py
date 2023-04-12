@@ -46,6 +46,11 @@ def main():
     app.run()
 
 
+@app.route('/')
+def to_the_news():
+    return render_template('chat.html')
+
+
 @app.route('/news', methods=['GET', 'POST'])
 def news():
     if not current_user.is_authenticated:
@@ -61,7 +66,17 @@ def news():
         if form_music.play.data:
             p = vlc.MediaPlayer("file:///music/wav/temp.wav")
             p.play()
-    return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'))
+    return render_template('news.html', link_logo=url_for('static', filename='img/logo.png', form_music=form_music))
+
+
+@app.route('/profile', methods=['GET', 'POST'])
+def profile():
+    return render_template('profile.html')
+
+
+@app.route('/chats')
+def chats():
+    return render_template('chats.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])

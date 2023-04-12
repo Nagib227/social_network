@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {% set news = [{"title": "1", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "1", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "1", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "1", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "1", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"title": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}] %}
+    {% set news = [{"author": "vasia", "content": "haglhbglagba;buig augb;ergi aаырыкурыурвырыупвыпуыпыпыуапмроамфмалфыиалфоыиалфлыоирлф оымаорфым афрма рфымарjhb;g"}, {"author": "2", "content": "haglhbglagba;buig a aаырыкурыурвырыупвыпуыпыпыуапмроамфмалфыиалф aаырыкурыурвырыупвыпуыпыпыуапмроамфмалфыиалфugb;ergi ajhb;g"}, {"author": "vasia", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "vasia", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "vasia", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "vasia", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}] %}
     {% for item in news %}
-        <h2>{{item["title"]}}</h2>
-        <div>{{item["content"]}}</div><br>
+        <div class="block_main">
+            <h4>{{item["author"]}}</h4>
+            {{item["content"]}}
+            <br><font color="#696969" size="3">дата - date</font>
+        </div>
+
     {% endfor %}
 {% endblock %}
