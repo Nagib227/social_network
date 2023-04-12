@@ -15,11 +15,11 @@ from forms.register import RegisterUserForm
 from forms.login import LoginUserForm
 from forms.music import MusicForm
 
-# import vlc
+import vlc
 # import winsound
-import sounddevice as sd
-import soundfile as sf
-
+# import sounddevice as sd
+# import soundfile as sf
+# import simpleaudio as sa
 
 
 LOGIN = ""
@@ -76,12 +76,8 @@ def reqister():
                                              q=request.form["name_music"])
             print(title_artist_imgUrl)
         if form_music.play.data:
-            array, smp_rt = sf.read(path_of_file, dtype = 'float32')
-            sd.play(array, smp_rt)
-            # status = sd.wait()
-            # sd.stop()
-            # p = vlc.MediaPlayer("file:///music/wav/temp.wav")
-            # p.play()
+            p = vlc.MediaPlayer("file:///music/wav/temp.wav")
+            p.play()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация',
@@ -124,12 +120,15 @@ def login():
                                              q=request.form["name_music"])
             print(title_artist_imgUrl)
         if form_music.play.data:
-            array, smp_rt = sf.read('music/wav/temp.wav', dtype = 'float32')
-            sd.play(array, smp_rt)
+            # wave_object = sa.WaveObject.from_wave_file('music/wav/temp.wav')
+            # play_object = wave_object.play()
+            # play_object.wait_done()
+            # array, smp_rt = sf.read('music/wav/temp.wav', dtype='float32')
+            # sd.play(array, smp_rt)
             # status = sd.wait()
             # sd.stop()
-            # p = vlc.MediaPlayer("file:///music/wav/temp.wav")
-            # p.play()
+            p = vlc.MediaPlayer("file:///music/wav/temp.wav")
+            p.play()
             # winsound.PlaySound('music/wav/temp.wav', winsound.SND_FILENAME)
     if form.validate_on_submit():
         db_sess = db_session.create_session()
