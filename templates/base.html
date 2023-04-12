@@ -49,6 +49,16 @@
     </div>
     <div class="music">
         <h6 align="center">music</h6>
+        <form action="" method="post">
+          {{ form_music.hidden_tag() }}
+          <div class="search">
+            {{ form_music.name_music(class="form-control input_music", type="text") }}
+            {{ form_music.btn_search(type="submit", class="btn btn_search") }}
+          </div>
+          <div class="play">
+            {{ form_music.play(type="submit", class="btn btn-primary") }}
+          </div>
+        </form>
     </div>
 </div>
 </body>

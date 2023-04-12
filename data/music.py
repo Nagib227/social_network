@@ -24,10 +24,12 @@ class M3U8Downloader:
 
     def download_audio(self, q: str):
         url = self._get_audio_url(q=q)
+        info = self._get_audio_info(q=q)
         segments = self._get_audio_segments(url=url)
         segments_data = self._parse_segments(segments=segments)
         segments = download_m3u8(segments_data=segments_data, index_url=url)
         self._convert_ts_to_mp3(segments=segments)
+        return info
 
     @staticmethod
     def _convert_ts_to_mp3(segments: bytes):
@@ -35,6 +37,15 @@ class M3U8Downloader:
             f.write(segments)
         os.system('bin\\ffmpeg.exe -y -i "music/segments/temp.ts" -vcodec copy -acodec copy -vbsf h264_mp4toannexb "music/wav/temp.wav"')
         os.remove("music/segments/temp.ts")
+
+    def _get_audio_info(self, q: str):
+        self._vk_audio.get_albums_iter()
+        audio = next(self._vk_audio.search_iter(q=q))
+        print(audio)
+        title = audio['title']
+        artist = audio['artist']
+        url_img = audio['track_covers'][1]
+        return [title, artist, url_img]
 
     def _get_audio_url(self, q: str):
         self._vk_audio.get_albums_iter()
@@ -94,7 +105,8 @@ def download_m3u8(segments_data: dict, index_url: str) -> bin:
 
 def find_music(login: str, password: str, q: str="Тутанхамон"):
     md = M3U8Downloader(login=login, password=password)
-    md.download_audio(q=q)
+    info = md.download_audio(q=q)
+    return info
 
 
 if __name__ == "__main__":
