@@ -3,7 +3,7 @@ from data import db_session
 from flask import *
 from flask_restful import reqparse, abort, Api, Resource
 
-from flask_login import LoginManager, login_user, current_user
+from flask_login import *
 
 from data.user import User
 from data.message import Message
@@ -14,12 +14,6 @@ from data.music import find_music
 from forms.register import RegisterUserForm
 from forms.login import LoginUserForm
 from forms.music import MusicForm
-
-import vlc
-# import winsound
-# import sounddevice as sd
-# import soundfile as sf
-# import simpleaudio as sa
 
 
 LOGIN = ""
@@ -52,32 +46,19 @@ def news():
         return redirect('/login')
     form_music = MusicForm()
     if form_music.validate_on_submit():
-        print(form_music.name_music.data, 1)
-        print(form_music.btn_search.data, 2)
         if form_music.btn_search.data:
             title_artist_imgUrl = find_music(login=LOGIN, password=PASSWORD,
-                                             q=request.form["name_music"])
+                                             name=current_user.id, q=request.form["input_music"])
             print(title_artist_imgUrl)
-        if form_music.play.data:
-            p = vlc.MediaPlayer("file:///music/wav/temp.wav")
-            p.play()
-    return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'))
+    return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'),
+                           form_music=form_music, name_music=current_user.id)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
-    form_music = MusicForm()
+    if current_user.is_authenticated:
+        return redirect('/news')
     form = RegisterUserForm()
-    if form_music.validate_on_submit():
-        print(form_music.name_music.data, 1)
-        print(form_music.btn_search.data, 2)
-        if form_music.btn_search.data:
-            title_artist_imgUrl = find_music(login=LOGIN, password=PASSWORD,
-                                             q=request.form["name_music"])
-            print(title_artist_imgUrl)
-        if form_music.play.data:
-            p = vlc.MediaPlayer("file:///music/wav/temp.wav")
-            p.play()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация',
@@ -110,54 +91,28 @@ def load_user(user_id):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form_music = MusicForm()
+    if current_user.is_authenticated:
+        return redirect('/news')
     form = LoginUserForm()
-    if form_music.validate_on_submit():
-        print(form_music.name_music.data, 1)
-        print(form_music.btn_search.data, 2)
-        if form_music.btn_search.data:
-            title_artist_imgUrl = find_music(login=LOGIN, password=PASSWORD,
-                                             q=request.form["name_music"])
-            print(title_artist_imgUrl)
-        if form_music.play.data:
-            # wave_object = sa.WaveObject.from_wave_file('music/wav/temp.wav')
-            # play_object = wave_object.play()
-            # play_object.wait_done()
-            # array, smp_rt = sf.read('music/wav/temp.wav', dtype='float32')
-            # sd.play(array, smp_rt)
-            # status = sd.wait()
-            # sd.stop()
-            p = vlc.MediaPlayer("file:///music/wav/temp.wav")
-            p.play()
-            # winsound.PlaySound('music/wav/temp.wav', winsound.SND_FILENAME)
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
-            login_user(user, remember=True)
-            print(current_user, 3) # зарегистрированный user # current_user
+            login_user(user, remember=True) # зарегистрированный user # current_user
             return redirect(f"/news")
         return render_template('login.html',
-                               title='Авторизация',
-                               message="Неправильный логин или пароль",
-                               form=form,
-                               form_music=form_music)
-    return render_template('login.html', title='Авторизация', form=form, form_music=form_music)
+                                title='Авторизация',
+                                message="Неправильный логин или пароль",
+                                form=form)
+    return render_template('login.html', title='Авторизация', form=form)
 # current_user
-'''
-@app.route('/music', methods=['GET', 'POST'])
-def music():
-    print(request.method)
-    if request.method == "POST":
-        print(request.form["name_music"])
-        print(request.form["find_music"])
-        # login
-        # password
-        find_music(login="", password="", q=request.form["name_music"])
-        p = vlc.MediaPlayer("file:///music/wav/temp.wav")
-        p.play()
-    return render_template('music.html')
-'''
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
 
 if __name__ == '__main__':
     main()

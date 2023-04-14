@@ -47,19 +47,19 @@
     <div class="block_weather">
         <h6 align="center">Weather</h6>
     </div>
+    {% if form_music %}
     <div class="music">
-        <h6 align="center">music</h6>
-        <form action="" method="post">
-          {{ form_music.hidden_tag() }}
-          <div class="search">
-            {{ form_music.name_music(class="form-control input_music", type="text") }}
-            {{ form_music.btn_search(type="submit", class="btn btn_search") }}
-          </div>
-          <div class="play">
-            {{ form_music.play(type="submit", class="btn btn-primary") }}
-          </div>
-        </form>
+      <h6 align="center">music</h6>
+      <form action="" method="post">
+        {{ form_music.hidden_tag() }}
+        <div class="search">
+          {{ form_music.input_music(class="form-control input_music", type="text") }}
+          {{ form_music.btn_search(type="submit", class="btn btn_search") }}
+        </div>
+      </form>
+      <audio controls="controls" autoplay="autoplay" src="static/music/wav/{{ name_music }}.wav"></audio>
     </div>
+    {% endif %}
 </div>
 </body>
 </html>

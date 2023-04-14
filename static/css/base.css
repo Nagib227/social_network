@@ -81,11 +81,19 @@ input {outline:none;}
   -webkit-box-shadow: none;
 }
 
-.music .search .btn_search img {
-
-  max-width: 40px;
-  max-height: 40px;
+.music audio {
+  max-width: 100%;
 }
+
+.music audio::-webkit-media-controls-panel,
+audio::-webkit-media-controls-mute-button,
+audio::-webkit-media-controls-play-button,
+audio::-webkit-media-controls-time-remaining-display,
+audio::-webkit-media-controls-current-time-display {
+  background-color: #cd9858;
+  color: #c2cb2f;
+}
+
 
 .navbar{
     position: fixed;
