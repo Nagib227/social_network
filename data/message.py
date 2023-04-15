@@ -16,5 +16,5 @@ class Message(SqlAlchemyBase, SerializerMixin):
     message = sqlalchemy.Column(sqlalchemy.String)
     chat_id = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey("chats.id"))
-    creat_data = sqlalchemy.Column(sqlalchemy.DateTime,
+    creat_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                    default=datetime.datetime.now)
