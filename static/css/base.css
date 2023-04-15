@@ -96,10 +96,6 @@ input {outline:none;}
   height: 40px;
 }
 
-.music .actions_with_playlist .btn_add:focus {
-  -webkit-box-shadow: none;
-}
-
 .music .actions_with_playlist .btn_direct_order {
   background-image: url(../img/direct_order_2.png);
   background-repeat: no-repeat;
@@ -108,10 +104,6 @@ input {outline:none;}
   padding: 0;
   width: 50px;
   height: 40px;
-}
-
-.music .actions_with_playlist .btn_direct_order:focus {
-  -webkit-box-shadow: none;
 }
 
 .music .actions_with_playlist .btn_random_order {
@@ -124,7 +116,39 @@ input {outline:none;}
   height: 40px;
 }
 
-.music .actions_with_playlist .btn_random_order:focus {
+.music .actions_with_playlist .btn_add:focus,
+.btn_direct_order:focus,
+.btn_random_order:focus {
+  -webkit-box-shadow: none;
+}
+
+.music .actions_with_tracks {
+  display: flex;
+  justify-content: space-around;
+}
+
+.music .actions_with_tracks .next_track {
+  background-image: url(../img/next_track.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 40px 40px;
+  padding: 0;
+  width: 50px;
+  height: 40px;
+}
+
+.music .actions_with_tracks .back_track {
+  background-image: url(../img/back_track.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 40px 40px;
+  padding: 0;
+  width: 50px;
+  height: 40px;
+}
+
+.music .actions_with_tracks .back_track:focus,
+.next_track:focus {
   -webkit-box-shadow: none;
 }
 

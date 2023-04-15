@@ -64,8 +64,12 @@
           {{ form_actions_playList.direct_order_playList(type="submit", class="btn btn_direct_order") }}
           {{ form_actions_playList.random_order_playList(type="submit", class="btn btn_random_order") }}
         </div>
+        <div class="actions_with_tracks">
+          {{ form_actions_playList.back_track(type="submit", class="btn back_track") }}
+          {{ form_actions_playList.next_track(type="submit", class="btn next_track") }}
+        </div>
       </form>
-      <audio controls="controls" autoplay="autoplay" loop="loop" src="{{ src_music }}"></audio>
+      <audio controls="controls" autoplay="autoplay" src="{{ src_music }}"></audio>
     </div>
     {% endif %}
 </div>

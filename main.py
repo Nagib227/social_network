@@ -16,7 +16,7 @@ from forms.login import LoginUserForm
 from forms.music import MusicForm
 from forms.actions_with_playlist import ActionsWithPlayList
 
-from random import choices
+from random import shuffle
 
 
 LOGIN = ""
@@ -45,7 +45,7 @@ def main():
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/news', methods=['GET', 'POST'])
 def news():
-    autoplay = ""
+    autoplay = "autoplay"
     
     if not current_user.is_authenticated:
         return redirect('/login')
@@ -81,10 +81,29 @@ def news():
             autoplay = "autoplay"
         if form_actions_playList.random_order_playList.data:
             print("random")
-            order_playList = choices(eval(authorized_user.playList))
+            order_playList = eval(authorized_user.playList)
+            shuffle(order_playList)
             authorized_user.current_order_playList = str(order_playList)
             authorized_user.current_track_info = str(order_playList[::-1][0])
             authorized_user.current_ind_track = 0
+            autoplay = "autoplay"
+        if form_actions_playList.next_track.data:
+            print("next")
+            order_playList = eval(authorized_user.current_order_playList)
+            authorized_user.current_ind_track += 1
+            if authorized_user.current_ind_track >= len(order_playList):
+                authorized_user.current_ind_track = 0
+            ind_track = authorized_user.current_ind_track
+            authorized_user.current_track_info = str(order_playList[::-1][ind_track])
+            autoplay = "autoplay"
+        if form_actions_playList.back_track.data:
+            print("back")
+            order_playList = eval(authorized_user.current_order_playList)
+            if authorized_user.current_ind_track <= 0:
+                authorized_user.current_ind_track = len(order_playList)
+            authorized_user.current_ind_track -= 1
+            ind_track = authorized_user.current_ind_track
+            authorized_user.current_track_info = str(order_playList[::-1][ind_track])
             autoplay = "autoplay"
             
     db_sess.commit()
