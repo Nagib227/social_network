@@ -57,7 +57,15 @@
           {{ form_music.btn_search(type="submit", class="btn btn_search") }}
         </div>
       </form>
-      <audio controls="controls" autoplay="autoplay" src="static/music/wav/{{ name_music }}.wav"></audio>
+      <form action="" method="post">
+        {{ form_actions_playList.hidden_tag() }}
+        <div class="actions_with_playlist">
+          {{ form_actions_playList.add_playList(type="submit", class="btn btn_add") }}
+          {{ form_actions_playList.direct_order_playList(type="submit", class="btn btn_direct_order") }}
+          {{ form_actions_playList.random_order_playList(type="submit", class="btn btn_random_order") }}
+        </div>
+      </form>
+      <audio controls="controls" autoplay="autoplay" loop="loop" src="{{ src_music }}"></audio>
     </div>
     {% endif %}
 </div>

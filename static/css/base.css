@@ -81,6 +81,53 @@ input {outline:none;}
   -webkit-box-shadow: none;
 }
 
+.music .actions_with_playlist {
+  display: flex;
+  justify-content: space-around;
+}
+
+.music .actions_with_playlist .btn_add {
+  background-image: url(../img/add_playList_2.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 48px 40px;
+  padding: 0;
+  width: 50px;
+  height: 40px;
+}
+
+.music .actions_with_playlist .btn_add:focus {
+  -webkit-box-shadow: none;
+}
+
+.music .actions_with_playlist .btn_direct_order {
+  background-image: url(../img/direct_order_2.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 35px 35px;
+  padding: 0;
+  width: 50px;
+  height: 40px;
+}
+
+.music .actions_with_playlist .btn_direct_order:focus {
+  -webkit-box-shadow: none;
+}
+
+.music .actions_with_playlist .btn_random_order {
+  background-image: url(../img/random_order.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 56px 40px;
+  padding: 0;
+  width: 50px;
+  height: 40px;
+}
+
+.music .actions_with_playlist .btn_random_order:focus {
+  -webkit-box-shadow: none;
+}
+
 .music audio {
   max-width: 100%;
 }

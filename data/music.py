@@ -11,8 +11,7 @@ from Crypto.Util.Padding import unpad
 
 class M3U8Downloader:
 
-    def __init__(self, login: str, password: str, name: str):
-        self.name = name
+    def __init__(self, login: str, password: str):
         self._vk_session = VkApi(
             login=login,
             password=password,
@@ -24,18 +23,18 @@ class M3U8Downloader:
 
     def download_audio(self, q: str):
         url = self._get_audio_url(q=q)
-        info = self._get_audio_info(q=q)
+        name, info = self._get_audio_info(q=q)
         segments = self._get_audio_segments(url=url)
         segments_data = self._parse_segments(segments=segments)
         segments = download_m3u8(segments_data=segments_data, index_url=url)
-        self._convert_ts_to_mp3(segments=segments)
+        self._convert_ts_to_mp3(segments=segments, name=name)
         return info
 
-    def _convert_ts_to_mp3(self, segments: bytes):
-        with open(f'static/music/segments/{self.name}.ts', 'wb') as f:
+    def _convert_ts_to_mp3(self, segments: bytes, name: str):
+        with open(f'static/music/segments/{name}.ts', 'wb') as f:
             f.write(segments)
-        os.system(f'bin\\ffmpeg.exe -y -i "static/music/segments/{self.name}.ts" -vcodec copy -acodec copy -vbsf h264_mp4toannexb "static/music/wav/{self.name}.wav"')
-        os.remove(f"static/music/segments/{self.name}.ts")
+        os.system(f'bin\\ffmpeg.exe -y -i "static/music/segments/{name}.ts" -vcodec copy -acodec copy -vbsf h264_mp4toannexb "static/music/wav/{name}.wav"')
+        os.remove(f"static/music/segments/{name}.ts")
 
     def _get_audio_info(self, q: str):
         self._vk_audio.get_albums_iter()
@@ -44,7 +43,7 @@ class M3U8Downloader:
         title = audio['title']
         artist = audio['artist']
         url_img = audio['track_covers'][1]
-        return [title, artist, url_img]
+        return [f"{title}_{artist}", [title, artist, url_img]]
 
     def _get_audio_url(self, q: str):
         self._vk_audio.get_albums_iter()
@@ -102,8 +101,8 @@ def download_m3u8(segments_data: dict, index_url: str) -> bin:
     return b''.join(downloaded_segments)
        
 
-def find_music(login: str, password: str,  name: str, q: str="Тутанхамон"):
-    md = M3U8Downloader(login=login, password=password, name=name)
+def find_music(login: str, password: str, q: str="Тутанхамон"):
+    md = M3U8Downloader(login=login, password=password)
     info = md.download_audio(q=q)
     return info
 
