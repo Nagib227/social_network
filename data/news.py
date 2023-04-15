@@ -18,5 +18,4 @@ class News(SqlAlchemyBase, UserMixin, SerializerMixin):
     
     creator = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey("users.id"))
-    
     creat_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
