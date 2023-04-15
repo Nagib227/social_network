@@ -10,16 +10,15 @@ body{
 }
 
 .block_1{
-    padding-left: 3%;
-    padding-top: 40px;
+    padding: 1.6%;
     background-color: #EDDDBA;
     border: 2px solid #BD9A7A;
-    display: inline-block;
+    border-radius: 10px;
     position: fixed;
-    top: 140px;
-    left: 14.5%;
-    width: 15%;
-    height: 300px;
+    top: 110px;
+    left: 17.5%;
+    width: 12%;
+    height: 220px;
 }
 
 .block_main{
@@ -27,21 +26,24 @@ body{
     padding: 5px;
     background-color: #f2dca7;
     border: 2px solid #BD9A7A;
+    border-radius: 10px;
     position: relative;
-    top: 130px;
+    top: 100px;
     width: 40%;
     left: 30%;
 }
 
 .music{
     padding: 5px;
-    border: 2px solid #BD9A7A;
-    background-color: #EDDDBA;
+    border: 0px solid #BD9A7A;
+    background-color: #FFFFFF;
+    border-radius: 5px;
     position: fixed;
-    left: 14.5%;
-    width: 15%;
-    top: 450px;
-    height: 100px;
+    left: 50%;
+    width: 19%;
+    top: 25px;
+    height: 50px;
+    z-index: 11;
 }
 
 .navbar{
@@ -50,4 +52,10 @@ body{
     left:0;
     width: 100%;
     z-index: 10;
+}
+
+.search_top{
+    position: relative;
+    top: 30px;
+    left: 21%;
 }

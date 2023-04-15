@@ -51,6 +51,11 @@ def to_the_news():
     return render_template('chat.html')
 
 
+@app.route('/chat/1')
+def chat_1():
+    return render_template('chat.html')
+
+
 @app.route('/news', methods=['GET', 'POST'])
 def news():
     if not current_user.is_authenticated:
