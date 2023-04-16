@@ -1,12 +1,12 @@
-{% extends "base.html" %}
+{% extends "base_short.html" %}
 
 {% block links %}
-<link rel="stylesheet" href="../static/css/login.css">
+<link rel="stylesheet" href="../static/css/reg_and_log.css">
 {% endblock %}
 
 {% block content %}
-    <h1>{{ title }}</h1>
-    <form action="" method="post">
+    <form class="form1" action="" method="post">
+        <h1>{{ title }}</h1>
         {{ form.hidden_tag() }}
         <p>
             {{ form.email.label }}<br>
@@ -26,7 +26,7 @@
                 </div>
             {% endfor %}
         </p>
-        <p>{{ form.submit(type="submit", class="btn btn-primary") }}</p>
+        <p align="center">{{ form.submit(type="submit", class="btn btn-primary") }}</p>
         <div>{{ message }}</div>
     </form>
 {% endblock %}
