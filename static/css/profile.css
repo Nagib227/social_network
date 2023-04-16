@@ -8,7 +8,7 @@
     top: 100px;
     left: 30%;
     width: 40%;
-    height: 300px;
+    height: 340px;
 }
 
 .photo{
@@ -28,3 +28,39 @@
     width: 68%;
     height: 260px;
 }
+
+.link1{
+    position: relative;
+    right: 25px;
+}
+
+.popup{
+    background: #EDDDBA;
+    border: 2px solid #BD9A7A;
+    position: fixed;
+    width: 50%;
+    height: 50%;
+    top: 25%;
+    left: 25%;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.popup:target{
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup__body{
+
+}
+
+.popup__content{
+
+}
+
+.popup__title{
+
+}
+
+.
