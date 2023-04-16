@@ -35,6 +35,7 @@
 }
 
 .popup{
+    padding: 20px;
     background: #EDDDBA;
     border: 2px solid #BD9A7A;
     position: fixed;
@@ -63,4 +64,3 @@
 
 }
 
-.
