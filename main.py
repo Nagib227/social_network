@@ -1,7 +1,7 @@
 from data import db_session
 
 from flask import *
-from flask_restful import reqparse, abort, Api, Resource
+from flask_restful import reqparse, abort, Api, Resource, url_for
 
 from flask_login import *
 
@@ -152,8 +152,10 @@ def news():
                            src_music=f'static/music/wav/{cur_track}.wav',
                            autoplay=autoplay)
 
-@app.route('/chat_1')
-def chat_1():
+
+@app.route('/chat/<chat_id>')
+@app.route('/chat')
+def chat1(chat_id=3):
     return render_template('chat.html')
 
 
@@ -197,6 +199,7 @@ def reqister():
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -214,10 +217,12 @@ def login():
                                 form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.get(User, user_id)
+
 
 @app.route('/logout')
 @login_required

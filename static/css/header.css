@@ -14,12 +14,12 @@ header .logo img {
   position: relative;
   max-width: 90%;
   max-height: 100px;
-  left: 170%;
+  left: 180%;
 }
 
 header .pages {
   margin-left: 6%;
-  width: 31.5%;
+  width: 100%;
   padding-top: 25px;
 }
 
