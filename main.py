@@ -14,13 +14,13 @@ from data.music import find_music
 from forms.register import RegisterUserForm
 from forms.login import LoginUserForm
 from forms.music import MusicForm
-from forms.actions_with_playlist import ActionsWithPlayList
+from forms.actions_with_tracks import ActionsWithTracks
+
+from data.VARIABLES import LOGIN, PASSWORD
 
 from random import shuffle
 
 
-LOGIN = ""
-PASSWORD = ""
 
 app = Flask(__name__)
 api = Api(app)
@@ -42,80 +42,98 @@ def main():
     # app.register_blueprint(job_api.blueprint)
     app.run()
 
+
+def processing_search_music(form_music, authorized_user, db_sess):
+    if form_music.btn_search.data:
+        print("search")
+        title_artist_imgUrl_nameFile = find_music(q=request.form["input_music"])
+        authorized_user.current_track_info = str(title_artist_imgUrl_nameFile)
+    db_sess.commit()
+    return None
+
+def processing_tracks_actions(form_actions_playList, authorized_user, db_sess):
+    if form_actions_playList.add_playList.data:
+        print("add")
+        playList = eval(authorized_user.playList)
+        title_artist_imgUrl_nameFile = eval(current_user.current_track_info)
+        if not title_artist_imgUrl_nameFile in playList:
+            playList.append(title_artist_imgUrl_nameFile)
+            authorized_user.playList = str(playList)
+            
+    if form_actions_playList.direct_order_playList.data:
+        print("direct")
+        order_playList = eval(authorized_user.playList)
+        if not order_playList:
+            return None
+        authorized_user.current_order_playList = str(order_playList)
+        authorized_user.current_track_info = str(order_playList[::-1][0])
+        authorized_user.current_ind_track = 0
+        
+    if form_actions_playList.random_order_playList.data:
+        print("random")
+        order_playList = eval(authorized_user.playList)
+        if not order_playList:
+            return None
+        shuffle(order_playList)
+        authorized_user.current_order_playList = str(order_playList)
+        authorized_user.current_track_info = str(order_playList[::-1][0])
+        authorized_user.current_ind_track = 0
+        
+    if form_actions_playList.next_track.data:
+        print("next")
+        order_playList = eval(authorized_user.current_order_playList)
+        if not order_playList:
+            return None
+        authorized_user.current_ind_track += 1
+        if authorized_user.current_ind_track >= len(order_playList):
+            authorized_user.current_ind_track = 0
+        ind_track = authorized_user.current_ind_track
+        authorized_user.current_track_info = str(order_playList[::-1][ind_track])
+        
+    if form_actions_playList.back_track.data:
+        print("back")
+        order_playList = eval(authorized_user.current_order_playList)
+        if not order_playList:
+            return None
+        if authorized_user.current_ind_track <= 0:
+            authorized_user.current_ind_track = len(order_playList)
+        authorized_user.current_ind_track -= 1
+        ind_track = authorized_user.current_ind_track
+        authorized_user.current_track_info = str(order_playList[::-1][ind_track])
+
+    db_sess.commit()
+    return None
+
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/news', methods=['GET', 'POST'])
 def news():
-    autoplay = "autoplay"
-    
     if not current_user.is_authenticated:
         return redirect('/login')
+    
+    autoplay = "autoplay"
     
     db_sess = db_session.create_session()
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
     
     form_music = MusicForm()
-    form_actions_playList = ActionsWithPlayList()
+    form_actions_tracks = ActionsWithTracks()
     
     if form_music.validate_on_submit():
-        if form_music.btn_search.data:
-            print("search")
-            title_artist_imgUrl = find_music(login=LOGIN, password=PASSWORD,
-                                             q=request.form["input_music"])
-            authorized_user.current_track_info = str(title_artist_imgUrl)
-            autoplay = "autoplay"
+        processing_search_music(form_music, authorized_user, db_sess)
             
-    if form_actions_playList.validate_on_submit():
-        if form_actions_playList.add_playList.data:
-            print("add")
-            playList = eval(authorized_user.playList)
-            title_artist_imgUrl = eval(current_user.current_track_info)
-            if not title_artist_imgUrl in playList:
-                playList.append(title_artist_imgUrl)
-                authorized_user.playList = str(playList)
-        if form_actions_playList.direct_order_playList.data:
-            print("direct")
-            order_playList = eval(authorized_user.playList)
-            authorized_user.current_order_playList = str(order_playList)
-            authorized_user.current_track_info = str(order_playList[::-1][0])
-            authorized_user.current_ind_track = 0
-            autoplay = "autoplay"
-        if form_actions_playList.random_order_playList.data:
-            print("random")
-            order_playList = eval(authorized_user.playList)
-            shuffle(order_playList)
-            authorized_user.current_order_playList = str(order_playList)
-            authorized_user.current_track_info = str(order_playList[::-1][0])
-            authorized_user.current_ind_track = 0
-            autoplay = "autoplay"
-        if form_actions_playList.next_track.data:
-            print("next")
-            order_playList = eval(authorized_user.current_order_playList)
-            authorized_user.current_ind_track += 1
-            if authorized_user.current_ind_track >= len(order_playList):
-                authorized_user.current_ind_track = 0
-            ind_track = authorized_user.current_ind_track
-            authorized_user.current_track_info = str(order_playList[::-1][ind_track])
-            autoplay = "autoplay"
-        if form_actions_playList.back_track.data:
-            print("back")
-            order_playList = eval(authorized_user.current_order_playList)
-            if authorized_user.current_ind_track <= 0:
-                authorized_user.current_ind_track = len(order_playList)
-            authorized_user.current_ind_track -= 1
-            ind_track = authorized_user.current_ind_track
-            authorized_user.current_track_info = str(order_playList[::-1][ind_track])
-            autoplay = "autoplay"
-            
-    db_sess.commit()
+    if form_actions_tracks.validate_on_submit():
+        processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
     
     cur_track = ""
     if authorized_user.current_track_info:
         track_info = eval(authorized_user.current_track_info)
-        cur_track = f"{track_info[0]}_{track_info[1]}" 
+        print(track_info)
+        cur_track = track_info[3]
      
     return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'),
                            form_music=form_music,
-                           form_actions_playList=form_actions_playList,
+                           form_actions_tracks=form_actions_tracks,
                            src_music=f'static/music/wav/{cur_track}.wav',
                            autoplay=autoplay)
 

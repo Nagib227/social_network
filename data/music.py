@@ -5,7 +5,7 @@ from vk_api import VkApi
 from vk_api.audio import VkAudio
 from Crypto.Cipher import AES
 from Crypto.Util.Padding import unpad
-# import subprocess
+from .VARIABLES import bad_name_elements, LOGIN, PASSWORD
 
 
 
@@ -22,8 +22,13 @@ class M3U8Downloader:
         self._vk_audio = VkAudio(self._vk_session)
 
     def download_audio(self, q: str):
-        url = self._get_audio_url(q=q)
         name, info = self._get_audio_info(q=q)
+        
+        if os.path.exists(f"static/music/wav/{name}.wav"):
+            print(1)
+            return info
+
+        url = self._get_audio_url(q=q)
         segments = self._get_audio_segments(url=url)
         segments_data = self._parse_segments(segments=segments)
         segments = download_m3u8(segments_data=segments_data, index_url=url)
@@ -43,7 +48,10 @@ class M3U8Downloader:
         title = audio['title']
         artist = audio['artist']
         url_img = audio['track_covers'][1]
-        return [f"{title}_{artist}", [title, artist, url_img]]
+        name = f"{title}_{artist}"
+        for i in bad_name_elements:
+            name = name.replace(i, "_")
+        return [name, [title, artist, url_img, name]]
 
     def _get_audio_url(self, q: str):
         self._vk_audio.get_albums_iter()
@@ -101,11 +109,12 @@ def download_m3u8(segments_data: dict, index_url: str) -> bin:
     return b''.join(downloaded_segments)
        
 
-def find_music(login: str, password: str, q: str="Тутанхамон"):
-    md = M3U8Downloader(login=login, password=password)
+def find_music(q: str="Тутанхамон"):
+    # md = M3U8Downloader(login=login, password=password)
+    print("999999999999999999999999999")
     info = md.download_audio(q=q)
     return info
 
-
+md = M3U8Downloader(login=LOGIN, password=PASSWORD)
 if __name__ == "__main__":
     find_music(login="", password="")
