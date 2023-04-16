@@ -1,4 +1,3 @@
-import datetime
 import sqlalchemy
 from sqlalchemy import orm
 from .db_session import SqlAlchemyBase
@@ -20,7 +19,10 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
     address = sqlalchemy.Column(sqlalchemy.String)
     email = sqlalchemy.Column(sqlalchemy.String, unique=True)
     way_profile_img = sqlalchemy.Column(sqlalchemy.String)
-    play_list = sqlalchemy.Column(sqlalchemy.String)
+    current_track_info = sqlalchemy.Column(sqlalchemy.String)
+    playList = sqlalchemy.Column(sqlalchemy.String)
+    current_order_playList = sqlalchemy.Column(sqlalchemy.String)
+    current_ind_track = sqlalchemy.Column(sqlalchemy.Integer)
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     # modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
 

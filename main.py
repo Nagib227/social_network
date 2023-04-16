@@ -3,7 +3,7 @@ from data import db_session
 from flask import *
 from flask_restful import reqparse, abort, Api, Resource
 
-from flask_login import LoginManager, login_user, current_user
+from flask_login import *
 
 from data.user import User
 from data.message import Message
@@ -14,16 +14,14 @@ from data.music import find_music
 from forms.register import RegisterUserForm
 from forms.login import LoginUserForm
 from forms.music import MusicForm
+from forms.actions_with_tracks import ActionsWithTracks
+from forms.actions_with_playList import ActionsWithPlayList
 
-import vlc
-# import winsound
-# import sounddevice as sd
-# import soundfile as sf
-# import simpleaudio as sa
+from data.VARIABLES import LOGIN, PASSWORD
+
+from random import shuffle
 
 
-LOGIN = ""
-PASSWORD = ""
 
 app = Flask(__name__)
 api = Api(app)
@@ -46,32 +44,117 @@ def main():
     app.run()
 
 
-@app.route('/')
-def to_the_news():
-    return render_template('chat.html')
+# @app.route('/')
+# def to_the_news():
+    # return render_template('chat.html')
 
 
-@app.route('/chat/1')
-def chat_1():
-    return render_template('chat.html')
+def processing_search_music(form_music, authorized_user, db_sess):
+    if form_music.btn_search.data:
+        print("search")
+        title_artist_imgUrl_nameFile = find_music(q=request.form["input_music"])
+        authorized_user.current_track_info = str(title_artist_imgUrl_nameFile)
+    db_sess.commit()
+    return None
+
+def processing_playList_actions(form_actions_playList, authorized_user, db_sess):
+    if form_actions_playList.add_playList.data:
+        print("add")
+        playList = eval(authorized_user.playList)
+        title_artist_imgUrl_nameFile = eval(current_user.current_track_info)
+        if not title_artist_imgUrl_nameFile in playList:
+            playList.append(title_artist_imgUrl_nameFile)
+            authorized_user.playList = str(playList)
+            
+    if form_actions_playList.direct_order_playList.data:
+        print("direct")
+        order_playList = eval(authorized_user.playList)
+        if not order_playList:
+            return None
+        authorized_user.current_order_playList = str(order_playList)
+        authorized_user.current_track_info = str(order_playList[::-1][0])
+        authorized_user.current_ind_track = 0
+        
+    if form_actions_playList.random_order_playList.data:
+        print("random")
+        order_playList = eval(authorized_user.playList)
+        if not order_playList:
+            return None
+        shuffle(order_playList)
+        authorized_user.current_order_playList = str(order_playList)
+        authorized_user.current_track_info = str(order_playList[::-1][0])
+        authorized_user.current_ind_track = 0
+
+    db_sess.commit()
+    return None
+
+def processing_tracks_actions(form_actions_tracks, authorized_user, db_sess):
+    if form_actions_tracks.next_track.data:
+        print("next")
+        order_playList = eval(authorized_user.current_order_playList)
+        if not order_playList:
+            return None
+        authorized_user.current_ind_track += 1
+        if authorized_user.current_ind_track >= len(order_playList):
+            authorized_user.current_ind_track = 0
+        ind_track = authorized_user.current_ind_track
+        authorized_user.current_track_info = str(order_playList[::-1][ind_track])
+        
+    if form_actions_tracks.back_track.data:
+        print("back")
+        order_playList = eval(authorized_user.current_order_playList)
+        if not order_playList:
+            return None
+        if authorized_user.current_ind_track <= 0:
+            authorized_user.current_ind_track = len(order_playList)
+        authorized_user.current_ind_track -= 1
+        ind_track = authorized_user.current_ind_track
+        authorized_user.current_track_info = str(order_playList[::-1][ind_track])
+
+    db_sess.commit()
+    return None
 
 
+@app.route('/', methods=['GET', 'POST'])
 @app.route('/news', methods=['GET', 'POST'])
 def news():
     if not current_user.is_authenticated:
         return redirect('/login')
+    
+    autoplay = "autoplay"
+    
+    db_sess = db_session.create_session()
+    authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
+    
     form_music = MusicForm()
+    form_actions_playList = ActionsWithPlayList()
+    form_actions_tracks = ActionsWithTracks()
+    
     if form_music.validate_on_submit():
-        print(form_music.name_music.data, 1)
-        print(form_music.btn_search.data, 2)
-        if form_music.btn_search.data:
-            title_artist_imgUrl = find_music(login=LOGIN, password=PASSWORD,
-                                             q=request.form["name_music"])
-            print(title_artist_imgUrl)
-        if form_music.play.data:
-            p = vlc.MediaPlayer("file:///music/wav/temp.wav")
-            p.play()
-    return render_template('news.html', link_logo=url_for('static', filename='img/logo.png', form_music=form_music))
+        processing_search_music(form_music, authorized_user, db_sess)
+
+    if form_actions_playList.validate_on_submit():
+        processing_playList_actions(form_actions_playList, authorized_user, db_sess)
+            
+    if form_actions_tracks.validate_on_submit():
+        processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
+    
+    cur_track = ""
+    if authorized_user.current_track_info:
+        track_info = eval(authorized_user.current_track_info)
+        print(track_info)
+        cur_track = track_info[3]
+     
+    return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'),
+                           form_music=form_music,
+                           form_actions_playList=form_actions_playList,
+                           form_actions_tracks=form_actions_tracks,
+                           src_music=f'static/music/wav/{cur_track}.wav',
+                           autoplay=autoplay)
+
+@app.route('/chat_1')
+def chat_1():
+    return render_template('chat.html')
 
 
 @app.route('/profile', methods=['GET', 'POST'])
@@ -86,18 +169,9 @@ def chats():
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
-    form_music = MusicForm()
+    if current_user.is_authenticated:
+        return redirect('/news')
     form = RegisterUserForm()
-    if form_music.validate_on_submit():
-        print(form_music.name_music.data, 1)
-        print(form_music.btn_search.data, 2)
-        if form_music.btn_search.data:
-            title_artist_imgUrl = find_music(login=LOGIN, password=PASSWORD,
-                                             q=request.form["name_music"])
-            print(title_artist_imgUrl)
-        if form_music.play.data:
-            p = vlc.MediaPlayer("file:///music/wav/temp.wav")
-            p.play()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация',
@@ -114,7 +188,8 @@ def reqister():
             age=int(form.age.data),
             num_phone=form.num_phone.data,
             address=form.address.data,
-            email=form.email.data
+            email=form.email.data,
+            playList="[]"
         )
         user.set_password(form.password.data)
         db_sess.add(user)
@@ -122,62 +197,34 @@ def reqister():
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
-@login_manager.user_loader
-def load_user(user_id):
-    db_sess = db_session.create_session()
-    return db_sess.query(User).get(user_id)
-
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    form_music = MusicForm()
+    if current_user.is_authenticated:
+        return redirect('/news')
     form = LoginUserForm()
-    if form_music.validate_on_submit():
-        print(form_music.name_music.data, 1)
-        print(form_music.btn_search.data, 2)
-        if form_music.btn_search.data:
-            title_artist_imgUrl = find_music(login=LOGIN, password=PASSWORD,
-                                             q=request.form["name_music"])
-            print(title_artist_imgUrl)
-        if form_music.play.data:
-            # wave_object = sa.WaveObject.from_wave_file('music/wav/temp.wav')
-            # play_object = wave_object.play()
-            # play_object.wait_done()
-            # array, smp_rt = sf.read('music/wav/temp.wav', dtype='float32')
-            # sd.play(array, smp_rt)
-            # status = sd.wait()
-            # sd.stop()
-            p = vlc.MediaPlayer("file:///music/wav/temp.wav")
-            p.play()
-            # winsound.PlaySound('music/wav/temp.wav', winsound.SND_FILENAME)
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
-            login_user(user, remember=True)
-            print(current_user, 3) # зарегистрированный user # current_user
+            login_user(user, remember=True) # зарегистрированный user # current_user
             return redirect(f"/news")
         return render_template('login.html',
-                               title='Авторизация',
-                               message="Неправильный логин или пароль",
-                               form=form,
-                               form_music=form_music)
-    return render_template('login.html', title='Авторизация', form=form, form_music=form_music)
-# current_user
-'''
-@app.route('/music', methods=['GET', 'POST'])
-def music():
-    print(request.method)
-    if request.method == "POST":
-        print(request.form["name_music"])
-        print(request.form["find_music"])
-        # login
-        # password
-        find_music(login="", password="", q=request.form["name_music"])
-        p = vlc.MediaPlayer("file:///music/wav/temp.wav")
-        p.play()
-    return render_template('music.html')
-'''
+                                title='Авторизация',
+                                message="Неправильный логин или пароль",
+                                form=form)
+    return render_template('login.html', title='Авторизация', form=form)
+
+@login_manager.user_loader
+def load_user(user_id):
+    db_sess = db_session.create_session()
+    return db_sess.get(User, user_id)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
 
 if __name__ == '__main__':
     main()

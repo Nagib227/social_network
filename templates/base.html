@@ -32,7 +32,35 @@
         <button class="btn btn-light">Поиск</button>
         </form>
     </div>
-
+    {% if form_music %}
+    <div class="music">
+      <div class="search_and_actions_playList">
+        <form action="" method="post">
+          {{ form_music.hidden_tag() }}
+          <div class="search">
+            {{ form_music.input_music(class="form-control input_music", type="text") }}
+            {{ form_music.btn_search(type="submit", class="btn btn_search") }}
+          </div>
+        </form>
+        <form action="" method="post">
+          {{ form_actions_playList.hidden_tag() }}
+          <div class="actions_with_playlist">
+            {{ form_actions_playList.add_playList(type="submit", class="btn btn_add") }}
+            {{ form_actions_playList.direct_order_playList(type="submit", class="btn btn_direct_order") }}
+            {{ form_actions_playList.random_order_playList(type="submit", class="btn btn_random_order") }}
+          </div>
+        </form>
+      </div>
+      <form action="" method="post">
+        {{ form_actions_tracks.hidden_tag() }}
+        <div class="actions_with_tracks">
+          {{ form_actions_tracks.back_track(type="submit", class="btn back_track") }}
+          <audio controls="controls" autoplay="autoplay" src="{{ src_music }}"></audio>
+          {{ form_actions_tracks.next_track(type="submit", class="btn next_track") }}
+        </div>
+      </form>
+    </div>
+    {% endif %}
 </header>
 
 <div class="block">
@@ -45,11 +73,6 @@
     </div>
 
     {% block content %}{% endblock %}
-
-    <div class="music">
-        <h6 align="center">music</h6>
-
-    </div>
 
 </div>
 </body>

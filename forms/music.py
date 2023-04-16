@@ -4,7 +4,6 @@ from wtforms.validators import DataRequired
 
 
 class MusicForm(FlaskForm):
-    name_music = StringField('Название трека', validators=[DataRequired()])
+    input_music = StringField('Название трека', validators=[DataRequired()])
     btn_search = SubmitField(' ')
-    play = SubmitField('play')
-
+    
