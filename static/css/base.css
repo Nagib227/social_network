@@ -1,54 +1,45 @@
 body{
     padding: 0px;
+    background-color: #F5E9CD;
 }
 
 input {outline:none;}
 
-.block{
-    position: relative;
-    width: 100%;
-    height: 100%;
+header {
+  background: #EDDDBA;
+  border: 2px solid #BD9A7A;
+  display: inline-flex;
+  position: fixed;
+  top: 0px;
+  width: 100%;
+  height: 100px;
+  z-index: 10;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
 }
 
-.block_1{
-    padding-left: 3%;
-    padding-top: 40px;
-    background-color: #ece89d;
-    border: 5px solid blue;
-    display: inline-block;
-    position: fixed;
-    top: 130px;
-    left: 9.5%;
-    width: 15%;
-    height: 300px;
+header .logo img {
+  border-radius: 50px;
+  position: relative;
+  max-width: 90%;
+  max-height: 100px;
 }
 
-.block_main{
-    padding: 5px;
-    border: 5px solid green;
-    display: inline-block;
-    position: relative;
-    top: 130px;
-    width: 50%;
-    left: 25%;
+.search_top{
+
 }
 
-.block_weather{
-    padding: 5px;
-    border: 5px solid yellow;
-    position: fixed;
-    top: 130px;
-    right: 0px;
-    width: 24.5%;
+.music {
+    border: 0px solid #BD9A7A;
+    background-color: #FFFFFF;
+    border-radius: 5px;
+    display: inline-flex;
+    align-items: center;
 }
 
-.music{
-    padding: 5px;
-    border: 5px solid blue;
-    position: fixed;
-    left: 9.5%;
-    width: 15%;
-    top: 450px;
+.music .search_and_actions_playList {
+
 }
 
 .music .search {
@@ -124,7 +115,7 @@ input {outline:none;}
 
 .music .actions_with_tracks {
   display: flex;
-  justify-content: space-around;
+  align-items: center;
 }
 
 .music .actions_with_tracks .next_track {
@@ -153,7 +144,7 @@ input {outline:none;}
 }
 
 .music audio {
-  max-width: 100%;
+  max-width: 16em;
 }
 
 .music audio::-webkit-media-controls-panel,
@@ -165,11 +156,32 @@ audio::-webkit-media-controls-current-time-display {
   color: #c2cb2f;
 }
 
-
-.navbar{
-    position: fixed;
-    top:0;
-    left:0;
+.block{
+    position: relative;
     width: 100%;
-    z-index: 10;
+    height: 100%;
+}
+
+.block_1{
+    padding: 1.6%;
+    background-color: #EDDDBA;
+    border: 2px solid #BD9A7A;
+    border-radius: 10px;
+    position: fixed;
+    top: 110px;
+    left: 17.5%;
+    width: 12%;
+    height: 220px;
+}
+
+.block_main{
+    margin-top: 10px;
+    padding: 5px;
+    background-color: #f2dca7;
+    border: 2px solid #BD9A7A;
+    border-radius: 10px;
+    position: relative;
+    top: 100px;
+    width: 40%;
+    left: 30%;
 }

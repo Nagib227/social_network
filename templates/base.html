@@ -12,66 +12,67 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300&family=Ubuntu:ital@1&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="static/css/header.css">
-    <link rel="stylesheet" href="static/css/base.css">
-    <link rel="icon" href="../data/img/icon.png">
+    <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="icon" href="/static/img/icon.png">
+
+    {% block links %}{% endblock %}
+
     <title>пример</title>
 </head>
 <body>
 <!-- Begin page content -->
 <header>
     <div class="logo">
-        <img src="static/img/logo.png" alt="logo">
+        <img src="/static/img/logo.png" alt="logo">
     </div>
-    <div class="pages">
-        <a href="#">main</a>
-        <a href="#">page №2</a>
-        <a href="#">page №3</a>
+    <div class="search_top">
+        <form class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="search" placeholder="Поиск людей">
+        <button class="btn btn-light">Поиск</button>
+        </form>
     </div>
-    <div class="btns"></div>
+    {% if form_music %}
+    <div class="music">
+      <div class="search_and_actions_playList">
+        <form action="" method="post">
+          {{ form_music.hidden_tag() }}
+          <div class="search">
+            {{ form_music.input_music(class="form-control input_music", type="text") }}
+            {{ form_music.btn_search(type="submit", class="btn btn_search") }}
+          </div>
+        </form>
+        <form action="" method="post">
+          {{ form_actions_playList.hidden_tag() }}
+          <div class="actions_with_playlist">
+            {{ form_actions_playList.add_playList(type="submit", class="btn btn_add") }}
+            {{ form_actions_playList.direct_order_playList(type="submit", class="btn btn_direct_order") }}
+            {{ form_actions_playList.random_order_playList(type="submit", class="btn btn_random_order") }}
+          </div>
+        </form>
+      </div>
+      <form action="" method="post">
+        {{ form_actions_tracks.hidden_tag() }}
+        <div class="actions_with_tracks">
+          {{ form_actions_tracks.back_track(type="submit", class="btn back_track") }}
+          <audio controls="controls" {% if autoplay %}autoplay="autoplay"{% endif %} src="{{ src_music }}"></audio>
+          {{ form_actions_tracks.next_track(type="submit", class="btn next_track") }}
+        </div>
+      </form>
+    </div>
+    {% endif %}
 </header>
 
 <div class="block">
     <div class="block_1">
-        <a href="main/{{mail}}"><h5>Мой профиль</h5></a><br>
-        <a href="news"><h5>Новости</h5></a><br>
-        <a href="messages"><h5>Сообщения</h5></a><br>
-        <a href="friends"><h5>Друзья</h5></a><br>
+        <a href="/profile/1" class="btn btn-light btn-sm"><h5>Мой профиль</h5></a><br>
+        <p></p>
+        <a href="/news" class="btn btn-light btn-sm"><h5>Новости</h5></a><br>
+        <p></p>
+        <a href="/chats" class="btn btn-light btn-sm"><h5>Чаты</h5></a><br>
     </div>
-    <div class="block_main">
-        <main role="main" class="container">
-            <h4 align="center">Main block</h4>
-            {% block content %}{% endblock %}
-        </main>
-    </div>
-    <div class="block_weather">
-        <h6 align="center">Weather</h6>
-    </div>
-    {% if form_music %}
-    <div class="music">
-      <h6 align="center">music</h6>
-      <form action="" method="post">
-        {{ form_music.hidden_tag() }}
-        <div class="search">
-          {{ form_music.input_music(class="form-control input_music", type="text") }}
-          {{ form_music.btn_search(type="submit", class="btn btn_search") }}
-        </div>
-      </form>
-      <form action="" method="post">
-        {{ form_actions_tracks.hidden_tag() }}
-        <div class="actions_with_playlist">
-          {{ form_actions_tracks.add_playList(type="submit", class="btn btn_add") }}
-          {{ form_actions_tracks.direct_order_playList(type="submit", class="btn btn_direct_order") }}
-          {{ form_actions_tracks.random_order_playList(type="submit", class="btn btn_random_order") }}
-        </div>
-        <div class="actions_with_tracks">
-          {{ form_actions_tracks.back_track(type="submit", class="btn back_track") }}
-          {{ form_actions_tracks.next_track(type="submit", class="btn next_track") }}
-        </div>
-      </form>
-      <audio controls="controls" autoplay="autoplay" src="{{ src_music }}"></audio>
-    </div>
-    {% endif %}
+
+    {% block content %}{% endblock %}
+
 </div>
 </body>
 </html>

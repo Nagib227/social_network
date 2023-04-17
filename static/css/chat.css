@@ -1,0 +1,34 @@
+.block_main{
+    padding: 0px;
+    height: 850px;
+    max-height: 850px;
+}
+
+.hat{
+    position: relative;
+    background-color: #f2dca7;
+    border-bottom-color: #BD9A7A;
+    border-bottom-style: solid;
+    border-bottom-width: 2px;
+    height: 50px;
+    width: 100%;
+    top: 5px;
+}
+
+.messages_area{
+    position: relative;
+    height: 715px;
+    max-height: 715px;
+}
+
+.sender{
+    padding: 10px;
+    position: relative;
+    background-color: #f2dca7;
+    border-top-color: #BD9A7A;
+    border-top-style: solid;
+    border-top-width: 2px;
+    height: 75px;
+    width: 100%;
+}
+

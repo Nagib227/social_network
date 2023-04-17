@@ -1,0 +1,62 @@
+.block_main{
+
+}
+
+.photo{
+    margin: 10px;
+    border: 2px solid blue;
+    position: relative;
+    width: 195px;
+    height: 260px;
+}
+
+.photo img{
+    max-width: 100%;
+}
+
+.info{
+    margin-top: 10px;
+    border: 2px solid blue;
+    position: relative;
+    width: 100%;
+    height: 260px;
+}
+
+.link1{
+    position: relative;
+    right: 25px;
+}
+
+.popup{
+    padding: 20px;
+    background: #EDDDBA;
+    border: 2px solid #BD9A7A;
+    position: fixed;
+    width: 50%;
+    height: 50%;
+    top: 25%;
+    left: 25%;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.popup:target{
+    opacity: 1;
+    visibility: visible;
+}
+
+.popup__body{
+
+}
+
+.popup__content{
+  text-align: center;
+}
+
+.popup__title{
+
+}
+
+.message {
+
+}

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block links %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/profile.css') }}">
+{% endblock %}
+
+{% block content %}
+    <div class="block_main">
+        <div class="row">
+            <div class="col-4"><div class="photo"><img src="{{ profile_user.way_profile_img }}" alt=""></div></div>
+            <div class="col-8"><div class="info">
+                <h3>{{ profile_user.surname }} {{ profile_user.name }}</h3>
+                <h4>age - {{ profile_user.age }}</h4>
+                <h5>num_phone - {{ profile_user.num_phone }}</h5>
+                <h5>address - {{ profile_user.address }}</h5>
+            </div></div>
+        </div>
+        {% if change %}
+        <div class="link1">
+            <div class="row justify-content-end">
+                <a href="#popup" class="btn btn-light">Изменить</a>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+    <div class="popup" id="popup">
+        <div class="popup__body">
+            <div class="popup__content">
+                <div class="popup__title">Изменить данные</div>
+                <div class="message">{{ message }}</div>
+                <form action="" method="post" enctype="multipart/form-data">
+                  {{ form_change.hidden_tag() }}
+                  {{ form_change.profile_img() }}
+                  <div class="row justify-content-end">
+                    {{ form_change.ok_submit(type="submit", class="btn btn-primary") }}
+                    <a href="#header" class="btn btn-primary">Отмена</a>
+                  </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
