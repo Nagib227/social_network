@@ -33,7 +33,6 @@
     border: 2px solid #BD9A7A;
     position: fixed;
     width: 50%;
-    height: 50%;
     top: 25%;
     left: 25%;
     opacity: 0;
@@ -50,7 +49,7 @@
 }
 
 .popup__content{
-  text-align: center;
+
 }
 
 .popup__title{
@@ -58,5 +57,5 @@
 }
 
 .message {
-
+  text-align: center;
 }

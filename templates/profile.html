@@ -22,16 +22,69 @@
             </div>
         </div>
         {% endif %}
-
     </div>
+    {% if profile_news %}
+    {% for news in profile_news %}
+        <div class="block_main">
+            <h4>{{ news.title }}</h4>
+            {{ news.text }}<br>
+            <font color="#696969" size="3">дата - date</font>
+        </div>
+    {% endfor %}
+    {% endif %}
     <div class="popup" id="popup">
         <div class="popup__body">
             <div class="popup__content">
+              <div class="text-center">
                 <div class="popup__title">Изменить данные</div>
                 <div class="message">{{ message }}</div>
+              </div>
                 <form action="" method="post" enctype="multipart/form-data">
                   {{ form_change.hidden_tag() }}
-                  {{ form_change.profile_img() }}
+                  <div class="profile_img">
+                    {{ form_change.profile_img() }}
+                  </div>
+
+                  {{ form_change.surname.label }}<br>
+                  {{ form_change.surname(class="form-control") }}<br>
+                  {% for error in form_change.surname.errors %}
+                  <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                  </p>
+                  {% endfor %}
+
+                  {{ form_change.name.label }}<br>
+                  {{ form_change.name(class="form-control") }}<br>
+                  {% for error in form_change.name.errors %}
+                  <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                  </p>
+                  {% endfor %}
+
+                  {{ form_change.age.label }}<br>
+                  {{ form_change.age(class="form-control") }}<br>
+                  {% for error in form_change.age.errors %}
+                  <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                  </p>
+                  {% endfor %}
+
+                  {{ form_change.num_phone.label }}<br>
+                  {{ form_change.num_phone(class="form-control") }}<br>
+                  {% for error in form_change.num_phone.errors %}
+                  <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                  </p>
+                  {% endfor %}
+
+                  {{ form_change.address.label }}<br>
+                  {{ form_change.address(class="form-control") }}<br>
+                  {% for error in form_change.address.errors %}
+                  <p class="alert alert-danger" role="alert">
+                    {{ error }}
+                  </p>
+                  {% endfor %}
+
                   <div class="row justify-content-end">
                     {{ form_change.ok_submit(type="submit", class="btn btn-primary") }}
                     <a href="#header" class="btn btn-primary">Отмена</a>

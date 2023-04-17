@@ -6,6 +6,7 @@ from flask_restful import reqparse, abort, Api, Resource
 from flask_login import *
 
 from data.user import User
+from data.news import News
 from data.message import Message
 from data.chat import Chat
 
@@ -155,7 +156,7 @@ def news():
                            form_music=form_music,
                            form_actions_playList=form_actions_playList,
                            form_actions_tracks=form_actions_tracks,
-                           src_music=f'static/music/wav/{cur_track}.wav',
+                           src_music=f'/static/music/wav/{cur_track}.wav',
                            autoplay=autoplay)
 
 @app.route('/chat_1')
@@ -176,6 +177,8 @@ def profile(profile_id):
     db_sess = db_session.create_session()
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
     profile_user = db_sess.query(User).filter(User.id == profile_id).first()
+    profile_news = db_sess.query(News).filter(News.creator_id == profile_id)
+    profile_news = sorted(profile_news, key=lambda x: x.creat_date, reverse=True)
 
     form_change = FormChangeProfile()
     form_music = MusicForm()
@@ -193,10 +196,21 @@ def profile(profile_id):
 
     if form_change.validate_on_submit() and change:
         print("save img")
+        
+        authorized_user.surname = form_change.surname.data
+        authorized_user.name = form_change.name.data
+        try:
+            authorized_user.age = int(form_change.age.data)
+        except ValueError:
+            message = "Не верный формат возраста"
+        authorized_user.num_phone = form_change.num_phone.data
+        authorized_user.address = form_change.address.data
+        db_sess.commit()
+        
         fileName = secure_filename(form_change.profile_img.data.filename)
-        if not allowed_file(fileName):
+        if fileName and not allowed_file(fileName):
             message = "Не верный формат изображения"
-        else:
+        elif fileName:
             file = form_change.profile_img.data
             save_img_profile(file, authorized_user, db_sess)
             return redirect('#header')
@@ -206,14 +220,21 @@ def profile(profile_id):
         track_info = eval(authorized_user.current_track_info)
         print(track_info)
         cur_track = track_info[3]
+
+    form_change.surname.data = profile_user.surname
+    form_change.name.data = profile_user.name
+    form_change.age.data = profile_user.age
+    form_change.num_phone.data = profile_user.num_phone
+    form_change.address.data = profile_user.address
      
     return render_template('profile.html', link_logo=url_for('static', filename='img/logo.png'),
                            form_music=form_music,
                            form_actions_playList=form_actions_playList,
                            form_actions_tracks=form_actions_tracks,
-                           src_music=f'static/music/wav/{cur_track}.wav',
+                           src_music=f'/static/music/wav/{cur_track}.wav',
                            autoplay=autoplay,
                            profile_user=profile_user,
+                           profile_news=profile_news,
                            change=change,
                            form_change=form_change,
                            message=message)

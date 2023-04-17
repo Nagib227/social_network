@@ -1,6 +1,7 @@
 import os
 import m3u8
 import requests
+import vk_api
 from vk_api import VkApi
 from vk_api.audio import VkAudio
 from Crypto.Cipher import AES
@@ -17,7 +18,12 @@ class M3U8Downloader:
             password=password,
             api_version='5.81'
         )
-        self._vk_session.auth()
+        try:
+            self._vk_session.auth()
+        except vk_api.exceptions.Captcha as captcha:
+            print(captcha.sid) # Получение sid
+            print(captcha.get_url()) # Получить ссылку на изображение капчи
+            raise vk_erorr
 
         self._vk_audio = VkAudio(self._vk_session)
 

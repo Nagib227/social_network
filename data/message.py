@@ -11,7 +11,7 @@ class Message(SqlAlchemyBase, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
-    creator = sqlalchemy.Column(sqlalchemy.Integer,
+    creator_id = sqlalchemy.Column(sqlalchemy.Integer,
                                sqlalchemy.ForeignKey("users.id"))
     message = sqlalchemy.Column(sqlalchemy.String)
     chat_id = sqlalchemy.Column(sqlalchemy.Integer,
