@@ -15,7 +15,6 @@ header {
   height: 100px;
   z-index: 10;
   display: flex;
-  justify-content: space-around;
   align-items: center;
 }
 
@@ -24,9 +23,12 @@ header .logo img {
   position: relative;
   max-width: 90%;
   max-height: 100px;
+  left: 180%;
 }
 
 .search_top{
+    position: fixed;
+    left: 31%;
 
 }
 
@@ -34,6 +36,9 @@ header .logo img {
     border: 0px solid #BD9A7A;
     background-color: #FFFFFF;
     border-radius: 5px;
+    position: fixed;
+    right: 20%;
+    top: 10px;
     display: inline-flex;
     align-items: center;
 }
@@ -124,8 +129,8 @@ header .logo img {
   background-position: center center;
   background-size: 40px 40px;
   padding: 0;
-  width: 50px;
-  height: 40px;
+  width: 40px;
+  height: 32px;
 }
 
 .music .actions_with_tracks .back_track {
@@ -134,8 +139,8 @@ header .logo img {
   background-position: center center;
   background-size: 40px 40px;
   padding: 0;
-  width: 50px;
-  height: 40px;
+  width: 40px;
+  height: 32px;
 }
 
 .music .actions_with_tracks .back_track:focus,
@@ -145,6 +150,7 @@ header .logo img {
 
 .music audio {
   max-width: 16em;
+  max-height: 50px;
 }
 
 .music audio::-webkit-media-controls-panel,

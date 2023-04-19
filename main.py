@@ -1,7 +1,7 @@
 from data import db_session
 
 from flask import *
-from flask_restful import reqparse, abort, Api, Resource
+from flask_restful import reqparse, abort, Api, Resource, url_for
 
 from flask_login import *
 
@@ -53,6 +53,7 @@ def processing_search_music(form_music=None, name_track="", authorized_user=None
     db_sess.commit()
     return None
 
+
 def processing_playList_actions(form_actions_playList, authorized_user, db_sess):
     if form_actions_playList.add_playList.data:
         print("add")
@@ -83,6 +84,7 @@ def processing_playList_actions(form_actions_playList, authorized_user, db_sess)
 
     db_sess.commit()
     return None
+
 
 def processing_tracks_actions(form_actions_tracks, authorized_user, db_sess):
     if form_actions_tracks.next_track.data:
@@ -116,12 +118,12 @@ def processing_tracks_actions(form_actions_tracks, authorized_user, db_sess):
 def news():
     if not current_user.is_authenticated:
         return redirect('/login')
-    
+
     autoplay = ""
-    
+
     db_sess = db_session.create_session()
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
-    
+
     form_music = MusicForm()
     form_actions_playList = ActionsWithPlayList()
     form_actions_tracks = ActionsWithTracks()
@@ -175,6 +177,7 @@ def profile(profile_id):
     profile_news = sorted(profile_news, key=lambda x: x.creat_date, reverse=True)
 
     form_change = FormChangeProfile()
+
     form_music = MusicForm()
     form_actions_playList = ActionsWithPlayList()
     form_actions_tracks = ActionsWithTracks()
@@ -247,6 +250,12 @@ def save_img_profile(file, authorized_user, db_sess):
     db_sess.commit()
 
 
+@app.route('/chat/<chat_id>')
+@app.route('/chat')
+def chat1(chat_id=3):
+    return render_template('chat.html')
+
+
 @app.route('/chats')
 def chats():
     return render_template('chats.html')
@@ -282,6 +291,7 @@ def reqister():
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -299,10 +309,12 @@ def login():
                                 form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
     return db_sess.get(User, user_id)
+
 
 @app.route('/logout')
 @login_required
