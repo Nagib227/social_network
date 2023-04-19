@@ -181,14 +181,14 @@ audio::-webkit-media-controls-current-time-display {
 }
 
 .playList {
-  padding: 1.6%;
+  padding: 0.8%;
   background-color: #EDDDBA;
   border: 2px solid #BD9A7A;
   border-radius: 10px;
   position: fixed;
   top: 110px;
   left: 70.5%;
-  width: 29%;
+  width: 17%;
 }
 
 .playList .form_track{
@@ -211,8 +211,8 @@ audio::-webkit-media-controls-current-time-display {
 }
 
 .playList .form_track .btn_track_div img {
-  max-width: 70px;
-  max-height: 70px;
+  max-width: 50px;
+  max-height: 50px;
 }
 
 .playList .form_track .btn_track_div .track_info {
