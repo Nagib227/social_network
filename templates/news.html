@@ -1,12 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-    {% set news = [{"author": "vasia", "content": "haglhbglagba;buig augb;ergi aаырыкурыурвырыупвыпуыпыпыуапм bроамфмалфыиалфоыиалфлыоирлф оымаорфым афрма рфымарjhb;g"}, {"author": "2", "content": "haglhbglagba;buig a aаырыкурыурвырыупвыпуыпыпыуапмроамфмалфыиалф aаырыкурыурвырыупвыпуыпыпыуапмроамфмалфыиалфugb;ergi ajhb;g"}, {"author": "vasia", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "vasia", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "vasia", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "vasia", "content": "haglhbglagba;buig augb;ergi ajhb;g"}, {"author": "2", "content": "haglhbglagba;buig augb;ergi ajhb;g"}] %}
+    <div class="block_main">
+        <div class="row">
+            <div class="col-10"><textarea class="form-control" placeholder="Написать новость" id="floatingTextarea2" style="min-height: 65px; width: 102%"></textarea></div>
+            <div class="col-1"><button type="submit" class="btn btn-primary mb-2" style="height: 63px; width: 100px">Отправить</button></div>
+        </div>
+    </div>
     {% for item in news %}
         <div class="block_main">
-            <h4>{{item["author"]}}</h4>
-            {{item["content"]}}
-            <br><font color="#696969" size="3">дата - date</font>
+            <h4>{{item[0]}} {{item[1]}}:</h4>
+            <p><font size="4">{{item[2]}}</font></p>
+            <br><font color="#696969" size="3">{{item[3]}}</font>
         </div>
 
     {% endfor %}

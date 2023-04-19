@@ -145,6 +145,17 @@ def news():
         track_info = eval(authorized_user.current_track_info)
         print(track_info)
         cur_track = track_info[3]
+
+    prenews = db_sess.query(User.name, User.surname, News.text, News.creation_date)\
+        .join(User, User.id == News.creator_id).all()
+
+    ready_news = []
+    for new in prenews:
+        time = ':'.join(str(new[3].time()).split('.')[0].split(':')[:-1])
+        date = str(new[3].date())
+        new = [*new[:-1], f'{date}, {time}']
+        ready_news.append(new)
+    print("jfgvjfg   ", ready_news)
      
     return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'),
                            form_music=form_music,
@@ -153,11 +164,8 @@ def news():
                            src_music=f'/static/music/wav/{cur_track}.wav',
                            autoplay=autoplay,
                            current_user=current_user,
-                           playList=eval(authorized_user.playList))
-
-@app.route('/chat_1')
-def chat_1():
-    return render_template('chat.html')
+                           playList=eval(authorized_user.playList),
+                           news=ready_news)
 
 
 @app.route('/profile/<int:profile_id>', methods=['GET', 'POST'])
@@ -174,7 +182,7 @@ def profile(profile_id):
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
     profile_user = db_sess.query(User).filter(User.id == profile_id).first()
     profile_news = db_sess.query(News).filter(News.creator_id == profile_id)
-    profile_news = sorted(profile_news, key=lambda x: x.creat_date, reverse=True)
+    profile_news = sorted(profile_news, key=lambda x: x.creation_date, reverse=True)
 
     form_change = FormChangeProfile()
 
