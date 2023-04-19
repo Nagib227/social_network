@@ -22,13 +22,11 @@ from forms.change_profile import FormChangeProfile
 from werkzeug.utils import secure_filename
 
 
-from data.VARIABLES import LOGIN, PASSWORD
+from data.VARIABLES import LOGIN, PASSWORD, ALLOWED_EXTENSIONS
 
 from random import shuffle
 
 
-
-ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 
 app = Flask(__name__)
 api = Api(app)
@@ -36,31 +34,22 @@ app.config['SECRET_KEY'] = 'very_secret_key_that_no_one_will_ever_crack_bread_11
 
 login_manager = LoginManager()
 login_manager.init_app(app)
-'''
-api.add_resource(user_resources.UserListResource, '/api/v2/users')
-api.add_resource(user_resources.UserResource, '/api/v2/users/<int:user_id>')
-
-api.add_resource(user_resources.UserListResource, '/api/v2/jobs')
-api.add_resource(job_resources.JobResource, '/api/v2/jobs/<int:job_id>')
-'''
 
 
 def main():
     db_session.global_init("db/social_network.db")
-    # app.register_blueprint(job_api.blueprint)
     app.run()
 
+def processing_search_music(form_music=None, name_track="", authorized_user=None, db_sess=None):
+    if form_music:
+        if form_music.btn_search.data:
+            print("search")
+            title_artist_imgUrl_nameFile = find_music(q=form_music.input_music.data)
 
-# @app.route('/')
-# def to_the_news():
-    # return render_template('chat.html')
-
-
-def processing_search_music(form_music, authorized_user, db_sess):
-    if form_music.btn_search.data:
-        print("search")
-        title_artist_imgUrl_nameFile = find_music(q=request.form["input_music"])
-        authorized_user.current_track_info = str(title_artist_imgUrl_nameFile)
+    if name_track:
+        print("name_track")
+        title_artist_imgUrl_nameFile = find_music(q=name_track)
+    authorized_user.current_track_info = str(title_artist_imgUrl_nameFile)
     db_sess.commit()
     return None
 
@@ -138,13 +127,16 @@ def news():
     form_actions_tracks = ActionsWithTracks()
     
     if form_music.validate_on_submit():
-        processing_search_music(form_music, authorized_user, db_sess)
+        processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
 
-    if form_actions_playList.validate_on_submit():
+    elif form_actions_playList.validate_on_submit():
         processing_playList_actions(form_actions_playList, authorized_user, db_sess)
             
-    if form_actions_tracks.validate_on_submit():
+    elif form_actions_tracks.validate_on_submit():
         processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
+
+    elif request.method == 'POST':
+        processing_search_music(name_track=request.form.get("name_track"), authorized_user=authorized_user, db_sess=db_sess)
     
     cur_track = ""
     if authorized_user.current_track_info:
@@ -157,7 +149,9 @@ def news():
                            form_actions_playList=form_actions_playList,
                            form_actions_tracks=form_actions_tracks,
                            src_music=f'/static/music/wav/{cur_track}.wav',
-                           autoplay=autoplay)
+                           autoplay=autoplay,
+                           current_user=current_user,
+                           playList=eval(authorized_user.playList))
 
 @app.route('/chat_1')
 def chat_1():
@@ -186,7 +180,7 @@ def profile(profile_id):
     form_actions_tracks = ActionsWithTracks()
     
     if form_music.validate_on_submit():
-        processing_search_music(form_music, authorized_user, db_sess)
+        processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
 
     if form_actions_playList.validate_on_submit():
         processing_playList_actions(form_actions_playList, authorized_user, db_sess)
@@ -233,6 +227,8 @@ def profile(profile_id):
                            form_actions_tracks=form_actions_tracks,
                            src_music=f'/static/music/wav/{cur_track}.wav',
                            autoplay=autoplay,
+                           current_user=current_user,
+                           playList=eval(authorized_user.playList),
                            profile_user=profile_user,
                            profile_news=profile_news,
                            change=change,

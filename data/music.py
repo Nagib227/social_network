@@ -31,7 +31,6 @@ class M3U8Downloader:
         name, info = self._get_audio_info(q=q)
         
         if os.path.exists(f"static/music/wav/{name}.wav"):
-            print(1)
             return info
 
         url = self._get_audio_url(q=q)

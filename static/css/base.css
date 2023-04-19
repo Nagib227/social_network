@@ -174,6 +174,48 @@ audio::-webkit-media-controls-current-time-display {
     height: 220px;
 }
 
+.playList {
+  padding: 1.6%;
+  background-color: #EDDDBA;
+  border: 2px solid #BD9A7A;
+  border-radius: 10px;
+  position: fixed;
+  top: 110px;
+  left: 70.5%;
+  width: 29%;
+}
+
+.playList .form_track{
+  width: 100%;
+  height: 10%;
+}
+
+.playList .form_track .name_track {
+  display: none;
+}
+
+.playList .form_track button {
+  width: 100%;
+}
+
+.playList .form_track .btn_track_div {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+}
+
+.playList .form_track .btn_track_div img {
+  max-width: 70px;
+  max-height: 70px;
+}
+
+.playList .form_track .btn_track_div .track_info {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .block_main{
     margin-top: 10px;
     padding: 5px;
