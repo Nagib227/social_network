@@ -40,6 +40,156 @@ def main():
     db_session.global_init("db/social_network.db")
     app.run()
 
+
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/news', methods=['GET', 'POST'])
+def news():
+    if not current_user.is_authenticated:
+        return redirect('/login')
+
+    autoplay = ""
+
+    db_sess = db_session.create_session()
+    authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
+
+    form_music = MusicForm()
+    form_actions_playList = ActionsWithPlayList()
+    form_actions_tracks = ActionsWithTracks()
+    
+    if form_music.validate_on_submit():
+        processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
+
+    elif form_actions_playList.validate_on_submit():
+        processing_playList_actions(form_actions_playList, authorized_user, db_sess)
+            
+    elif form_actions_tracks.validate_on_submit():
+        processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
+
+    elif request.method == 'POST':
+        processing_search_music(name_track=request.form.get("name_track"), authorized_user=authorized_user, db_sess=db_sess)
+    
+    cur_track = ""
+    if authorized_user.current_track_info:
+        track_info = eval(authorized_user.current_track_info)
+        print(track_info)
+        cur_track = track_info[3]
+     
+    return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'),
+                           form_music=form_music,
+                           form_actions_playList=form_actions_playList,
+                           form_actions_tracks=form_actions_tracks,
+                           src_music=f'/static/music/wav/{cur_track}.wav',
+                           autoplay=autoplay,
+                           current_user=current_user,
+                           playList=eval(authorized_user.playList)[::-1])
+
+@app.route('/chat_1')
+def chat_1():
+    return render_template('chat.html')
+
+
+@app.route('/profile/<int:profile_id>', methods=['GET', 'POST'])
+def profile(profile_id):
+    if not current_user.is_authenticated:
+        return redirect('/login')
+    
+    autoplay = ""
+    message = ""
+
+    change = profile_id == current_user.id
+    
+    db_sess = db_session.create_session()
+    authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
+    profile_user = db_sess.query(User).filter(User.id == profile_id).first()
+    profile_news = db_sess.query(News).filter(News.creator_id == profile_id)
+    profile_news = sorted(profile_news, key=lambda x: x.creat_date, reverse=True)
+
+    form_change = FormChangeProfile()
+
+    form_music = MusicForm()
+    form_actions_playList = ActionsWithPlayList()
+    form_actions_tracks = ActionsWithTracks()
+    
+    if form_music.validate_on_submit():
+        processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
+
+    if form_actions_playList.validate_on_submit():
+        processing_playList_actions(form_actions_playList, authorized_user, db_sess)
+            
+    if form_actions_tracks.validate_on_submit():
+        processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
+
+    if form_change.validate_on_submit() and change:
+        print("save img")
+        
+        authorized_user.surname = form_change.surname.data
+        authorized_user.name = form_change.name.data
+        try:
+            authorized_user.age = int(form_change.age.data)
+        except ValueError:
+            message = "Не верный формат возраста"
+        authorized_user.num_phone = form_change.num_phone.data
+        authorized_user.address = form_change.address.data
+        db_sess.commit()
+        
+        fileName = secure_filename(form_change.profile_img.data.filename)
+        if fileName and not allowed_file(fileName):
+            message = "Не верный формат изображения"
+        elif fileName:
+            file = form_change.profile_img.data
+            save_img_profile(file, authorized_user, db_sess)
+        if not message:
+            return redirect('#header')
+
+    cur_track = ""
+    if authorized_user.current_track_info:
+        track_info = eval(authorized_user.current_track_info)
+        print(track_info)
+        cur_track = track_info[3]
+
+    form_change.surname.data = profile_user.surname
+    form_change.name.data = profile_user.name
+    form_change.age.data = profile_user.age
+    form_change.num_phone.data = profile_user.num_phone
+    form_change.address.data = profile_user.address
+     
+    return render_template('profile.html', link_logo=url_for('static', filename='img/logo.png'),
+                           form_music=form_music,
+                           form_actions_playList=form_actions_playList,
+                           form_actions_tracks=form_actions_tracks,
+                           src_music=f'/static/music/wav/{cur_track}.wav',
+                           autoplay=autoplay,
+                           current_user=current_user,
+                           playList=eval(authorized_user.playList),
+                           profile_user=profile_user,
+                           profile_news=profile_news,
+                           change=change,
+                           form_change=form_change,
+                           message=message)
+
+def allowed_file(filename):
+    """ Функция проверки расширения файла """
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def save_img_profile(file, authorized_user, db_sess):
+    file.save(f"static/img_profiles/{authorized_user.id}.png")
+
+    authorized_user.way_profile_img = f"/static/img_profiles/{authorized_user.id}.png"
+    db_sess.commit()
+
+
+@app.route('/chat/<chat_id>')
+@app.route('/chat')
+def chat1(chat_id=3):
+    return render_template('chat.html')
+
+
+@app.route('/chats')
+def chats():
+    return render_template('chats.html')
+
+
 def processing_search_music(form_music=None, name_track="", authorized_user=None, db_sess=None):
     if form_music:
         if form_music.btn_search.data:
@@ -111,154 +261,6 @@ def processing_tracks_actions(form_actions_tracks, authorized_user, db_sess):
 
     db_sess.commit()
     return None
-
-
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/news', methods=['GET', 'POST'])
-def news():
-    if not current_user.is_authenticated:
-        return redirect('/login')
-
-    autoplay = ""
-
-    db_sess = db_session.create_session()
-    authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
-
-    form_music = MusicForm()
-    form_actions_playList = ActionsWithPlayList()
-    form_actions_tracks = ActionsWithTracks()
-    
-    if form_music.validate_on_submit():
-        processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
-
-    elif form_actions_playList.validate_on_submit():
-        processing_playList_actions(form_actions_playList, authorized_user, db_sess)
-            
-    elif form_actions_tracks.validate_on_submit():
-        processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
-
-    elif request.method == 'POST':
-        processing_search_music(name_track=request.form.get("name_track"), authorized_user=authorized_user, db_sess=db_sess)
-    
-    cur_track = ""
-    if authorized_user.current_track_info:
-        track_info = eval(authorized_user.current_track_info)
-        print(track_info)
-        cur_track = track_info[3]
-     
-    return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'),
-                           form_music=form_music,
-                           form_actions_playList=form_actions_playList,
-                           form_actions_tracks=form_actions_tracks,
-                           src_music=f'/static/music/wav/{cur_track}.wav',
-                           autoplay=autoplay,
-                           current_user=current_user,
-                           playList=eval(authorized_user.playList))
-
-@app.route('/chat_1')
-def chat_1():
-    return render_template('chat.html')
-
-
-@app.route('/profile/<int:profile_id>', methods=['GET', 'POST'])
-def profile(profile_id):
-    if not current_user.is_authenticated:
-        return redirect('/login')
-    
-    autoplay = ""
-    message = ""
-
-    change = profile_id == current_user.id
-    
-    db_sess = db_session.create_session()
-    authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
-    profile_user = db_sess.query(User).filter(User.id == profile_id).first()
-    profile_news = db_sess.query(News).filter(News.creator_id == profile_id)
-    profile_news = sorted(profile_news, key=lambda x: x.creat_date, reverse=True)
-
-    form_change = FormChangeProfile()
-
-    form_music = MusicForm()
-    form_actions_playList = ActionsWithPlayList()
-    form_actions_tracks = ActionsWithTracks()
-    
-    if form_music.validate_on_submit():
-        processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
-
-    if form_actions_playList.validate_on_submit():
-        processing_playList_actions(form_actions_playList, authorized_user, db_sess)
-            
-    if form_actions_tracks.validate_on_submit():
-        processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
-
-    if form_change.validate_on_submit() and change:
-        print("save img")
-        
-        authorized_user.surname = form_change.surname.data
-        authorized_user.name = form_change.name.data
-        try:
-            authorized_user.age = int(form_change.age.data)
-        except ValueError:
-            message = "Не верный формат возраста"
-        authorized_user.num_phone = form_change.num_phone.data
-        authorized_user.address = form_change.address.data
-        db_sess.commit()
-        
-        fileName = secure_filename(form_change.profile_img.data.filename)
-        if fileName and not allowed_file(fileName):
-            message = "Не верный формат изображения"
-        elif fileName:
-            file = form_change.profile_img.data
-            save_img_profile(file, authorized_user, db_sess)
-            return redirect('#header')
-
-    cur_track = ""
-    if authorized_user.current_track_info:
-        track_info = eval(authorized_user.current_track_info)
-        print(track_info)
-        cur_track = track_info[3]
-
-    form_change.surname.data = profile_user.surname
-    form_change.name.data = profile_user.name
-    form_change.age.data = profile_user.age
-    form_change.num_phone.data = profile_user.num_phone
-    form_change.address.data = profile_user.address
-     
-    return render_template('profile.html', link_logo=url_for('static', filename='img/logo.png'),
-                           form_music=form_music,
-                           form_actions_playList=form_actions_playList,
-                           form_actions_tracks=form_actions_tracks,
-                           src_music=f'/static/music/wav/{cur_track}.wav',
-                           autoplay=autoplay,
-                           current_user=current_user,
-                           playList=eval(authorized_user.playList),
-                           profile_user=profile_user,
-                           profile_news=profile_news,
-                           change=change,
-                           form_change=form_change,
-                           message=message)
-
-def allowed_file(filename):
-    """ Функция проверки расширения файла """
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def save_img_profile(file, authorized_user, db_sess):
-    file.save(f"static/img_profiles/{authorized_user.id}.png")
-
-    authorized_user.way_profile_img = f"/static/img_profiles/{authorized_user.id}.png"
-    db_sess.commit()
-
-
-@app.route('/chat/<chat_id>')
-@app.route('/chat')
-def chat1(chat_id=3):
-    return render_template('chat.html')
-
-
-@app.route('/chats')
-def chats():
-    return render_template('chats.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])
