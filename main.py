@@ -66,13 +66,10 @@ def news():
     elif request.method == 'POST':
         name_track = request.form.get("name_track", False)
         text_news = request.form.get("text_news", False)
-        print(name_track)
-        print(text_news)
         if name_track:
             processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
         if text_news:
             add_news(text_news=text_news, creator_id=current_user.id)
-            # (text_news=text_news, authorized_user=authorized_user, db_sess=db_sess)
 
 
     cur_track = get_current_track(authorized_user)
@@ -127,7 +124,7 @@ def profile(profile_id):
 
     if form_change.validate_on_submit() and change:
         print("save img")
-        message = processing(form_change, authorized_user, db_sess)
+        message = processing_form_change(form_change, authorized_user, db_sess)
         if not message:
             return redirect('#header')
 
@@ -172,108 +169,6 @@ def chat1(chat_id=3):
 def chats():
     return render_template('chats.html')
 
-
-def processing_search_music(form_music=None, name_track="", authorized_user=None, db_sess=None):
-    if form_music:
-        if form_music.btn_search.data:
-            print("search")
-            title_artist_imgUrl_nameFile = find_music(q=form_music.input_music.data)
-
-    if name_track:
-        print("name_track")
-        title_artist_imgUrl_nameFile = find_music(q=name_track)
-    authorized_user.current_track_info = str(title_artist_imgUrl_nameFile)
-    db_sess.commit()
-    return None
-
-
-def processing_playList_actions(form_actions_playList, authorized_user, db_sess):
-    if form_actions_playList.add_playList.data:
-        print("add")
-        playList = eval(authorized_user.playList)
-        title_artist_imgUrl_nameFile = eval(current_user.current_track_info)
-        if not title_artist_imgUrl_nameFile in playList:
-            playList.append(title_artist_imgUrl_nameFile)
-            authorized_user.playList = str(playList)
-            
-    if form_actions_playList.direct_order_playList.data:
-        print("direct")
-        order_playList = eval(authorized_user.playList)
-        if not order_playList:
-            return None
-        authorized_user.current_order_playList = str(order_playList)
-        authorized_user.current_track_info = str(order_playList[::-1][0])
-        authorized_user.current_ind_track = 0
-        
-    if form_actions_playList.random_order_playList.data:
-        print("random")
-        order_playList = eval(authorized_user.playList)
-        if not order_playList:
-            return None
-        shuffle(order_playList)
-        authorized_user.current_order_playList = str(order_playList)
-        authorized_user.current_track_info = str(order_playList[::-1][0])
-        authorized_user.current_ind_track = 0
-
-    db_sess.commit()
-    return None
-
-
-def processing_tracks_actions(form_actions_tracks, authorized_user, db_sess):
-    if form_actions_tracks.next_track.data:
-        print("next")
-        order_playList = eval(authorized_user.current_order_playList)
-        if not order_playList:
-            return None
-        authorized_user.current_ind_track += 1
-        if authorized_user.current_ind_track >= len(order_playList):
-            authorized_user.current_ind_track = 0
-        ind_track = authorized_user.current_ind_track
-        authorized_user.current_track_info = str(order_playList[::-1][ind_track])
-        
-    if form_actions_tracks.back_track.data:
-        print("back")
-        order_playList = eval(authorized_user.current_order_playList)
-        if not order_playList:
-            return None
-        if authorized_user.current_ind_track <= 0:
-            authorized_user.current_ind_track = len(order_playList)
-        authorized_user.current_ind_track -= 1
-        ind_track = authorized_user.current_ind_track
-        authorized_user.current_track_info = str(order_playList[::-1][ind_track])
-
-    db_sess.commit()
-    return None
-
-def processing(form_change, authorized_user, db_sess):
-    message = ""
-    
-    authorized_user.surname = form_change.surname.data
-    authorized_user.name = form_change.name.data
-    try:
-        authorized_user.age = int(form_change.age.data)
-    except ValueError:
-        message = "Не верный формат возраста"
-    authorized_user.num_phone = form_change.num_phone.data
-    authorized_user.address = form_change.address.data
-    db_sess.commit()
-
-    fileName = secure_filename(form_change.profile_img.data.filename)
-    if fileName and not allowed_file(fileName):
-        message = "Не верный формат изображения"
-    elif fileName:
-        file = form_change.profile_img.data
-        save_img_profile(file, authorized_user, db_sess)
-    return message
-        
-
-def put_values_in_form_change(form_change, profile_user):
-    form_change.surname.data = profile_user.surname
-    form_change.name.data = profile_user.name
-    form_change.age.data = profile_user.age
-    form_change.num_phone.data = profile_user.num_phone
-    form_change.address.data = profile_user.address
-    return form_change
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
@@ -370,6 +265,109 @@ def get_news(authorized_user, db_sess, filter_user=None):
 
     print("jfgvjfg   ", ready_news)
     return ready_news
+
+
+def put_values_in_form_change(form_change, profile_user):
+    form_change.surname.data = profile_user.surname
+    form_change.name.data = profile_user.name
+    form_change.age.data = profile_user.age
+    form_change.num_phone.data = profile_user.num_phone
+    form_change.address.data = profile_user.address
+    return form_change
+
+
+def processing_search_music(form_music=None, name_track="", authorized_user=None, db_sess=None):
+    if form_music:
+        if form_music.btn_search.data:
+            print("search")
+            title_artist_imgUrl_nameFile = find_music(q=form_music.input_music.data)
+
+    if name_track:
+        print("name_track")
+        title_artist_imgUrl_nameFile = find_music(q=name_track)
+    authorized_user.current_track_info = str(title_artist_imgUrl_nameFile)
+    db_sess.commit()
+    return None
+
+
+def processing_playList_actions(form_actions_playList, authorized_user, db_sess):
+    if form_actions_playList.add_playList.data:
+        print("add")
+        playList = eval(authorized_user.playList)
+        title_artist_imgUrl_nameFile = eval(current_user.current_track_info)
+        if not title_artist_imgUrl_nameFile in playList:
+            playList.append(title_artist_imgUrl_nameFile)
+            authorized_user.playList = str(playList)
+            
+    if form_actions_playList.direct_order_playList.data:
+        print("direct")
+        order_playList = eval(authorized_user.playList)
+        if not order_playList:
+            return None
+        authorized_user.current_order_playList = str(order_playList)
+        authorized_user.current_track_info = str(order_playList[::-1][0])
+        authorized_user.current_ind_track = 0
+        
+    if form_actions_playList.random_order_playList.data:
+        print("random")
+        order_playList = eval(authorized_user.playList)
+        if not order_playList:
+            return None
+        shuffle(order_playList)
+        authorized_user.current_order_playList = str(order_playList)
+        authorized_user.current_track_info = str(order_playList[::-1][0])
+        authorized_user.current_ind_track = 0
+
+    db_sess.commit()
+    return None
+
+
+def processing_tracks_actions(form_actions_tracks, authorized_user, db_sess):
+    if form_actions_tracks.next_track.data:
+        print("next")
+        order_playList = eval(authorized_user.current_order_playList)
+        if not order_playList:
+            return None
+        authorized_user.current_ind_track += 1
+        if authorized_user.current_ind_track >= len(order_playList):
+            authorized_user.current_ind_track = 0
+        ind_track = authorized_user.current_ind_track
+        authorized_user.current_track_info = str(order_playList[::-1][ind_track])
+        
+    if form_actions_tracks.back_track.data:
+        print("back")
+        order_playList = eval(authorized_user.current_order_playList)
+        if not order_playList:
+            return None
+        if authorized_user.current_ind_track <= 0:
+            authorized_user.current_ind_track = len(order_playList)
+        authorized_user.current_ind_track -= 1
+        ind_track = authorized_user.current_ind_track
+        authorized_user.current_track_info = str(order_playList[::-1][ind_track])
+
+    db_sess.commit()
+    return None
+
+def processing_form_change(form_change, authorized_user, db_sess):
+    message = ""
+    
+    authorized_user.surname = form_change.surname.data
+    authorized_user.name = form_change.name.data
+    try:
+        authorized_user.age = int(form_change.age.data)
+    except ValueError:
+        message = "Не верный формат возраста"
+    authorized_user.num_phone = form_change.num_phone.data
+    authorized_user.address = form_change.address.data
+    db_sess.commit()
+
+    fileName = secure_filename(form_change.profile_img.data.filename)
+    if fileName and not allowed_file(fileName):
+        message = "Не верный формат изображения"
+    elif fileName:
+        file = form_change.profile_img.data
+        save_img_profile(file, authorized_user, db_sess)
+    return message
 
 
 if __name__ == '__main__':
