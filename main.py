@@ -146,16 +146,7 @@ def news():
         print(track_info)
         cur_track = track_info[3]
 
-    prenews = db_sess.query(User.name, User.surname, News.text, News.creation_date)\
-        .join(User, User.id == News.creator_id).all()
-
-    ready_news = []
-    for new in prenews:
-        time = ':'.join(str(new[3].time()).split('.')[0].split(':')[:-1])
-        date = str(new[3].date())
-        new = [*new[:-1], f'{date}, {time}']
-        ready_news.append(new)
-    print("jfgvjfg   ", ready_news)
+    ready_news = get_news(authorized_user, db_sess)
      
     return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'),
                            form_music=form_music,
@@ -181,8 +172,8 @@ def profile(profile_id):
     db_sess = db_session.create_session()
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
     profile_user = db_sess.query(User).filter(User.id == profile_id).first()
-    profile_news = db_sess.query(News).filter(News.creator_id == profile_id)
-    profile_news = sorted(profile_news, key=lambda x: x.creation_date, reverse=True)
+
+    profile_news = get_news(authorized_user, db_sess, filter_user=True)
 
     form_change = FormChangeProfile()
 
@@ -218,7 +209,7 @@ def profile(profile_id):
         elif fileName:
             file = form_change.profile_img.data
             save_img_profile(file, authorized_user, db_sess)
-            return redirect('#header')
+        return redirect('#header')
 
     cur_track = ""
     if authorized_user.current_track_info:
@@ -329,6 +320,27 @@ def load_user(user_id):
 def logout():
     logout_user()
     return redirect("/")
+
+
+def get_news(authorized_user, db_sess, filter_user=None):
+    if filter_user:
+        prenews = db_sess.query(User.name, User.surname, News.text, News.creation_date) \
+            .filter(News.creator_id == authorized_user.id) \
+            .join(User, User.id == News.creator_id).all()
+    else:
+        prenews = db_sess.query(User.name, User.surname, News.text, News.creation_date) \
+            .join(User, User.id == News.creator_id).all()
+
+    ready_news = []
+    for new in prenews:
+        time = ':'.join(str(new[3].time()).split('.')[0].split(':')[:-1])
+        date = str(new[3].date())
+        new = [*new[:-1], f'{date}, {time}']
+        ready_news.append(new)
+    ready_news.sort(key=lambda a: a[3], reverse=True)
+
+    print("jfgvjfg   ", ready_news)
+    return ready_news
 
 
 if __name__ == '__main__':

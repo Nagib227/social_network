@@ -24,12 +24,13 @@
         {% endif %}
     </div>
     {% if profile_news %}
-    {% for news in profile_news %}
+    {% for item in profile_news %}
         <div class="block_main">
-            <h4>{{ news.title }}</h4>
-            {{ news.text }}<br>
-            <font color="#696969" size="3">дата - date</font>
+            <h4>{{item[0]}} {{item[1]}}:</h4>
+            <p><font size="4">{{item[2]}}</font></p>
+            <br><font color="#696969" size="3">{{item[3]}}</font>
         </div>
+
     {% endfor %}
     {% endif %}
     <div class="popup" id="popup">
