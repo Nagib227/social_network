@@ -189,7 +189,20 @@ audio::-webkit-media-controls-current-time-display {
   position: fixed;
   top: 110px;
   left: 70.5%;
+  overflow-y: auto;
   width: 17%;
+  height: 85vh;
+}
+
+.playList::-webkit-scrollbar {
+  width: 0;
+}
+
+.playList .tracks {
+  position: absolute;
+  width: 80%;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .playList .form_track{

@@ -82,7 +82,7 @@ def news():
                            src_music=f'/static/music/wav/{cur_track}.wav',
                            autoplay=autoplay,
                            current_user=current_user,
-                           playList=eval(authorized_user.playList),
+                           playList=eval(authorized_user.playList)[::-1],
                            news=ready_news)
 
 

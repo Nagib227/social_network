@@ -73,22 +73,24 @@
 
     <div class="playList">
       <h4>PlayList</h4>
-      {% for track in playList %}
-      <form class="" action="" method="post">
-        <div class="form_track">
-          <input type="text" class="name_track" name="name_track" value="{{ track[0] }} {{ track[1] }}">
-          <button type="submit" name="btn_track" id="btn_track">
-            <div class="btn_track_div">
-              <img src="{{ track[2] }}" alt="img_track">
-              <div class="track_info">
-                <h5>{{ track[0] }}</h5>
-                <h7>{{ track[1] }}</h7>
+      <div class="tracks">
+        {% for track in playList %}
+        <form class="" action="" method="post">
+          <div class="form_track">
+            <input type="text" class="name_track" name="name_track" value="{{ track[0] }} {{ track[1] }}">
+            <button type="submit" name="btn_track" id="btn_track">
+              <div class="btn_track_div">
+                <img src="{{ track[2] }}" alt="img_track">
+                <div class="track_info">
+                  <h5>{{ track[0] }}</h5>
+                  <h7>{{ track[1] }}</h7>
+                </div>
               </div>
-            </div>
-          </button>
-        </div>
-      </form>
-      {% endfor %}
+            </button>
+          </div>
+        </form>
+        {% endfor %}
+      </div>
     </div>
 
     {% block content %}{% endblock %}
