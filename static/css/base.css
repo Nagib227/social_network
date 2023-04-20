@@ -20,10 +20,11 @@ header {
 
 header .logo img {
   border-radius: 50px;
-  position: relative;
-  max-width: 90%;
-  max-height: 100px;
-  left: 180%;
+  position: fixed;
+  max-width: 80%;
+  max-height: 96px;
+  top: 2px;
+  left: 18%;
 }
 
 .search_top{
@@ -181,14 +182,14 @@ audio::-webkit-media-controls-current-time-display {
 }
 
 .playList {
-  padding: 1.6%;
+  padding: 0.8%;
   background-color: #EDDDBA;
   border: 2px solid #BD9A7A;
   border-radius: 10px;
   position: fixed;
   top: 110px;
   left: 70.5%;
-  width: 29%;
+  width: 17%;
 }
 
 .playList .form_track{
@@ -211,8 +212,8 @@ audio::-webkit-media-controls-current-time-display {
 }
 
 .playList .form_track .btn_track_div img {
-  max-width: 70px;
-  max-height: 70px;
+  max-width: 50px;
+  max-height: 50px;
 }
 
 .playList .form_track .btn_track_div .track_info {
@@ -224,7 +225,7 @@ audio::-webkit-media-controls-current-time-display {
 
 .block_main{
     margin-top: 10px;
-    padding: 5px;
+    padding: 10px;
     background-color: #f2dca7;
     border: 2px solid #BD9A7A;
     border-radius: 10px;
@@ -232,4 +233,5 @@ audio::-webkit-media-controls-current-time-display {
     top: 100px;
     width: 40%;
     left: 30%;
+
 }

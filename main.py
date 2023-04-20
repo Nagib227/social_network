@@ -52,9 +52,7 @@ def news():
     db_sess = db_session.create_session()
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
 
-    form_music = MusicForm()
-    form_actions_playList = ActionsWithPlayList()
-    form_actions_tracks = ActionsWithTracks()
+    form_music, form_actions_playList, form_actions_tracks = creat_forms_music()
     
     if form_music.validate_on_submit():
         processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
@@ -66,13 +64,19 @@ def news():
         processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
 
     elif request.method == 'POST':
-        processing_search_music(name_track=request.form.get("name_track"), authorized_user=authorized_user, db_sess=db_sess)
-    
-    cur_track = ""
-    if authorized_user.current_track_info:
-        track_info = eval(authorized_user.current_track_info)
-        print(track_info)
-        cur_track = track_info[3]
+        name_track = request.form.get("name_track", False)
+        text_news = request.form.get("text_news", False)
+        print(name_track)
+        print(text_news)
+        if name_track:
+            processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
+        if text_news:
+            add_news(text_news=text_news, creator_id=current_user.id)
+            # (text_news=text_news, authorized_user=authorized_user, db_sess=db_sess)
+
+
+    cur_track = get_current_track(authorized_user)
+    ready_news = get_news(authorized_user, db_sess)
      
     return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'),
                            form_music=form_music,
@@ -81,12 +85,18 @@ def news():
                            src_music=f'/static/music/wav/{cur_track}.wav',
                            autoplay=autoplay,
                            current_user=current_user,
-                           playList=eval(authorized_user.playList)[::-1])
+                           playList=eval(authorized_user.playList),
+                           news=ready_news)
 
-@app.route('/chat_1')
-def chat_1():
-    return render_template('chat.html')
 
+def add_news(text_news, creator_id):
+    db_sess = db_session.create_session()
+    news = News(
+        text=text_news,
+        creator_id=creator_id)
+    db_sess.add(news)
+    db_sess.commit()
+    
 
 @app.route('/profile/<int:profile_id>', methods=['GET', 'POST'])
 def profile(profile_id):
@@ -101,14 +111,10 @@ def profile(profile_id):
     db_sess = db_session.create_session()
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
     profile_user = db_sess.query(User).filter(User.id == profile_id).first()
-    profile_news = db_sess.query(News).filter(News.creator_id == profile_id)
-    profile_news = sorted(profile_news, key=lambda x: x.creat_date, reverse=True)
 
     form_change = FormChangeProfile()
 
-    form_music = MusicForm()
-    form_actions_playList = ActionsWithPlayList()
-    form_actions_tracks = ActionsWithTracks()
+    form_music, form_actions_playList, form_actions_tracks = creat_forms_music()
     
     if form_music.validate_on_submit():
         processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
@@ -121,37 +127,14 @@ def profile(profile_id):
 
     if form_change.validate_on_submit() and change:
         print("save img")
-        
-        authorized_user.surname = form_change.surname.data
-        authorized_user.name = form_change.name.data
-        try:
-            authorized_user.age = int(form_change.age.data)
-        except ValueError:
-            message = "Не верный формат возраста"
-        authorized_user.num_phone = form_change.num_phone.data
-        authorized_user.address = form_change.address.data
-        db_sess.commit()
-        
-        fileName = secure_filename(form_change.profile_img.data.filename)
-        if fileName and not allowed_file(fileName):
-            message = "Не верный формат изображения"
-        elif fileName:
-            file = form_change.profile_img.data
-            save_img_profile(file, authorized_user, db_sess)
+        message = processing(form_change, authorized_user, db_sess)
         if not message:
             return redirect('#header')
 
-    cur_track = ""
-    if authorized_user.current_track_info:
-        track_info = eval(authorized_user.current_track_info)
-        print(track_info)
-        cur_track = track_info[3]
-
-    form_change.surname.data = profile_user.surname
-    form_change.name.data = profile_user.name
-    form_change.age.data = profile_user.age
-    form_change.num_phone.data = profile_user.num_phone
-    form_change.address.data = profile_user.address
+    cur_track = get_current_track(authorized_user)
+    profile_news = get_news(authorized_user, db_sess, filter_user=True)
+    
+    form_change = put_values_in_form_change(form_change, profile_user)
      
     return render_template('profile.html', link_logo=url_for('static', filename='img/logo.png'),
                            form_music=form_music,
@@ -262,6 +245,35 @@ def processing_tracks_actions(form_actions_tracks, authorized_user, db_sess):
     db_sess.commit()
     return None
 
+def processing(form_change, authorized_user, db_sess):
+    message = ""
+    
+    authorized_user.surname = form_change.surname.data
+    authorized_user.name = form_change.name.data
+    try:
+        authorized_user.age = int(form_change.age.data)
+    except ValueError:
+        message = "Не верный формат возраста"
+    authorized_user.num_phone = form_change.num_phone.data
+    authorized_user.address = form_change.address.data
+    db_sess.commit()
+
+    fileName = secure_filename(form_change.profile_img.data.filename)
+    if fileName and not allowed_file(fileName):
+        message = "Не верный формат изображения"
+    elif fileName:
+        file = form_change.profile_img.data
+        save_img_profile(file, authorized_user, db_sess)
+    return message
+        
+
+def put_values_in_form_change(form_change, profile_user):
+    form_change.surname.data = profile_user.surname
+    form_change.name.data = profile_user.name
+    form_change.age.data = profile_user.age
+    form_change.num_phone.data = profile_user.num_phone
+    form_change.address.data = profile_user.address
+    return form_change
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
@@ -323,6 +335,41 @@ def load_user(user_id):
 def logout():
     logout_user()
     return redirect("/")
+
+
+def creat_forms_music():
+    form_music = MusicForm()
+    form_actions_playList = ActionsWithPlayList()
+    form_actions_tracks = ActionsWithTracks()
+    return form_music, form_actions_playList, form_actions_tracks
+
+def get_current_track(authorized_user):
+    cur_track = ""
+    if authorized_user.current_track_info:
+        track_info = eval(authorized_user.current_track_info)
+        print(track_info)
+        cur_track = track_info[3]
+    return cur_track
+
+
+def get_news(authorized_user, db_sess, filter_user=None):
+    if filter_user:
+        prenews = db_sess.query(User.name, User.surname, News.text, News.creation_date) \
+                  .filter(News.creator_id == authorized_user.id).join(User, User.id == News.creator_id).all()
+    else:
+        prenews = db_sess.query(User.name, User.surname, News.text, News.creation_date)\
+                  .join(User, User.id == News.creator_id).all()
+
+    ready_news = []
+    for new in prenews:
+        time = ':'.join(str(new[3].time()).split('.')[0].split(':')[:-1])
+        date = str(new[3].date())
+        new = [*new[:-1], f'{date}, {time}']
+        ready_news.append(new)
+    ready_news.sort(key=lambda a: a[3], reverse=True)
+
+    print("jfgvjfg   ", ready_news)
+    return ready_news
 
 
 if __name__ == '__main__':

@@ -115,8 +115,6 @@ def download_m3u8(segments_data: dict, index_url: str) -> bin:
        
 
 def find_music(q: str="Тутанхамон"):
-    # md = M3U8Downloader(login=login, password=password)
-    print("999999999999999999999999999")
     info = md.download_audio(q=q)
     return info
 

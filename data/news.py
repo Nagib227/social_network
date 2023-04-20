@@ -12,10 +12,9 @@ class News(SqlAlchemyBase, UserMixin, SerializerMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer,
                            primary_key=True, autoincrement=True)
-    
-    title = sqlalchemy.Column(sqlalchemy.String)
+
     text = sqlalchemy.Column(sqlalchemy.String)
 
     creator_id = sqlalchemy.Column(sqlalchemy.Integer,
                                    sqlalchemy.ForeignKey("users.id"))
-    creat_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+    creation_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
