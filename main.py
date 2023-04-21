@@ -253,13 +253,6 @@ def load_user(user_id):
     return db_sess.get(User, user_id)
 
 
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect("/")
-
-
 def creat_forms_music():
     form_music = MusicForm()
     form_actions_playList = ActionsWithPlayList()
@@ -410,6 +403,18 @@ def processing_form_change(form_change, authorized_user, db_sess):
         file = form_change.profile_img.data
         save_img_profile(file, authorized_user, db_sess)
     return message
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
+
+@app.route('/reviews')
+def reviews():
+    return render_template("reviews.html")
 
 
 if __name__ == '__main__':
