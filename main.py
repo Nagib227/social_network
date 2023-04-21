@@ -1,3 +1,5 @@
+from sqlalchemy import or_
+
 from data import db_session
 
 from flask import *
@@ -8,7 +10,7 @@ from flask_login import *
 from data.user import User
 from data.news import News
 from data.message import Message
-from data.chat import Chat
+from data.chats import Chats
 
 from data.music import find_music
 
@@ -74,7 +76,6 @@ def news():
             found_people = processing_search_people(search_people=search_people_query)
         if text_news:
             add_news(text_news=text_news, creator_id=current_user.id)
-
 
     cur_track = get_current_track(authorized_user)
     ready_news = get_news(authorized_user, db_sess)
@@ -153,7 +154,7 @@ def profile(profile_id):
                            form_actions_tracks=form_actions_tracks,
                            src_music=f'/static/music/wav/{cur_track}.wav',
                            autoplay=autoplay,
-                           current_user=current_user,
+                           authorized_user=authorized_user,
                            playList=eval(authorized_user.playList)[::-1],
                            profile_user=profile_user,
                            profile_news=profile_news,
@@ -176,12 +177,26 @@ def save_img_profile(file, authorized_user, db_sess):
 
 @app.route('/chat/<chat_id>', methods=['GET', 'POST'])
 @app.route('/chat', methods=['GET', 'POST'])
-def chat(chat_id=3):
+def chat(chat_id):
+    db_sess = db_session.create_session()
+    authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
+    cur_chat = db_sess.query(Chats.id, Chats.name).filter(Chats.id == chat_id)
+
+    # if isinstance(chat, list):
+    #     users = chat_id
+    #     chat_id = db_sess.query(chats.id).filter(or_(', '.join([users[0].email, users[1].email]) == chats.members),
+    #                                              ', '.join([users[1].email, users[0].email]) == chats.members).first()
+    #     print(chat_id)
+    #     if chat_id:
+    #         return redirect(f'/chat/{chat_id}')
+    # else:
+
     if request.method == 'POST':
         input_message = request.form.get("input_message", False)
         if input_message:
             print("push_message")
             print(input_message)
+            create_message(authorized_user.id, input_message, cur_chat.id, db_sess)
             ##################################################################################################
             # input_message - строка которую пользователь ввёл в поле ввода для сообшений
             # засунь весь код в какую-нибудь функцию
@@ -189,13 +204,36 @@ def chat(chat_id=3):
             # processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
             ##################################################################################################
 
-            
+    messages = db_sess.query(User.name, User.surname, Message.message, Message.creat_date)\
+        .filter(Message.chat_id == cur_chat.id).join(User, User.id == Message.creator_id)
+
+    # осталось только доделать вывод сообщений, остальное готово
+
     return render_template('chat.html')
 
 
 @app.route('/chats')
 def chats():
-    return render_template('chats.html')
+    db_sess = db_session.create_session()
+    authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
+
+    chats = db_sess.query(Chats.name, Chats.members, Chats.id)\
+        .filter(Chats.members.like(f'% {authorized_user.email}%')).all()
+    print(chats)
+    ready_chats = []
+
+    for chat in chats:
+        if chat[0] == 'личный':
+            members = chat[1].split(', ')
+            if authorized_user.email == members[0]:
+                person_id = members[1]
+            else:
+                person_id = members[0]
+            name = ' '.join(db_sess.query(User.name, User.surname).filter(User.email == person_id).first())
+            chat = [name, ', '.join(members), chat[2]]
+        ready_chats.append(chat)
+
+    return render_template('chats.html', chats=ready_chats)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -305,6 +343,7 @@ def processing_search_people(search_people):
                                           search_people.lower() in f"{x.name.lower()} {x.surname.lower()}"), all_users))
     return found_people
 
+
 def processing_search_music(form_music=None, name_track="", authorized_user=None, db_sess=None):
     order_playList = eval(authorized_user.playList)[::-1]
     if form_music:
@@ -383,6 +422,7 @@ def processing_tracks_actions(form_actions_tracks, authorized_user, db_sess):
     db_sess.commit()
     return None
 
+
 def processing_form_change(form_change, authorized_user, db_sess):
     message = ""
     
@@ -403,6 +443,24 @@ def processing_form_change(form_change, authorized_user, db_sess):
         file = form_change.profile_img.data
         save_img_profile(file, authorized_user, db_sess)
     return message
+
+
+def create_chat(creator_id, members, db_sess, name='личный'):
+    if len(members) > 2:
+        name = 'групповой'
+    chat = Chats(name=name,
+                 creator=creator_id,
+                 members=', '.join(members))
+    db_sess.add(chat)
+    db_sess.commit()
+
+
+def create_message(creator_id, text, chat_id, db_sess):
+    message = Message(creator_id=creator_id,
+                      message=text,
+                      chat_id=chat_id)
+    db_sess.add(message)
+    db_sess.commit()
 
 
 @app.route('/logout')
