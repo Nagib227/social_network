@@ -1,0 +1,116 @@
+.music_block .search_block {
+  display: inline-flex;
+  max-width: 100%;
+  background: #ffffff;
+  border: 1px solid black;
+  border-radius: 7px;
+}
+
+.music_block .search_block .input_music {
+  outline: none;
+  border: 0px;
+}
+
+.music_block .search_block .input_music:focus {
+  -webkit-box-shadow: none;
+}
+
+.music_block .search_block .btn_search {
+  background-image: url(../img/search.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 40px 40px;
+  padding: 0;
+  width: 50px;
+  height: 40px;
+}
+
+.music_block .search_block .btn_search:focus {
+  -webkit-box-shadow: none;
+}
+
+.music_block .actions_with_playlist_block {
+  display: flex;
+  justify-content: space-around;
+}
+
+.music_block .actions_with_playlist_block .btn_add {
+  background-image: url(../img/add_playList_2.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 48px 40px;
+  padding: 0;
+  width: 50px;
+  height: 40px;
+}
+
+.music_block .actions_with_playlist_block .btn_direct_order {
+  background-image: url(../img/direct_order_2.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 35px 35px;
+  padding: 0;
+  width: 50px;
+  height: 40px;
+}
+
+.music_block .actions_with_playlist_block .btn_random_order {
+  background-image: url(../img/random_order.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 56px 40px;
+  padding: 0;
+  width: 50px;
+  height: 40px;
+}
+
+.music_block .actions_with_playlist_block .btn_add:focus,
+.btn_direct_order:focus,
+.btn_random_order:focus {
+  -webkit-box-shadow: none;
+}
+
+.music_block .actions_with_tracks_block {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+}
+
+.music_block .actions_with_tracks_block .next_track {
+  background-image: url(../img/next_track.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 40px 40px;
+  padding: 0;
+  width: 40px;
+  height: 32px;
+}
+
+.music_block .actions_with_tracks_block .back_track {
+  background-image: url(../img/back_track.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: 40px 40px;
+  padding: 0;
+  width: 40px;
+  height: 32px;
+}
+
+.music_block .actions_with_tracks_block .back_track:focus,
+.next_track:focus {
+  -webkit-box-shadow: none;
+}
+
+.music_block audio {
+  max-width: 100%;
+  max-height: 50px;
+}
+
+.music_block audio::-webkit-media-controls-panel,
+audio::-webkit-media-controls-mute-button,
+audio::-webkit-media-controls-play-button,
+audio::-webkit-media-controls-time-remaining-display,
+audio::-webkit-media-controls-current-time-display {
+  background-color: #cd9858;
+  color: #c2cb2f;
+}

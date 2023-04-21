@@ -300,6 +300,7 @@ def processing_search_people(search_people):
     return found_people
 
 def processing_search_music(form_music=None, name_track="", authorized_user=None, db_sess=None):
+    order_playList = eval(authorized_user.playList)[::-1]
     if form_music:
         if form_music.btn_search.data:
             print("search")
@@ -307,8 +308,13 @@ def processing_search_music(form_music=None, name_track="", authorized_user=None
 
     if name_track:
         print("name_track")
-        title_artist_imgUrl_nameFile = find_music(q=name_track)
+        name_track = name_track.split("<;>")
+        title_artist_imgUrl_nameFile = list(filter(lambda x: name_track[0] in x and\
+                                                   name_track[1] in x, order_playList))[0]
+        
+    authorized_user.current_order_playList = str(order_playList)
     authorized_user.current_track_info = str(title_artist_imgUrl_nameFile)
+    authorized_user.current_ind_track = order_playList.index(title_artist_imgUrl_nameFile)
     db_sess.commit()
     return None
 
@@ -324,21 +330,21 @@ def processing_playList_actions(form_actions_playList, authorized_user, db_sess)
             
     if form_actions_playList.direct_order_playList.data:
         print("direct")
-        order_playList = eval(authorized_user.playList)
+        order_playList = eval(authorized_user.playList)[::-1]
         if not order_playList:
             return None
-        authorized_user.current_order_playList = str(order_playList[::-1])
-        authorized_user.current_track_info = str(order_playList[::-1][0])
+        authorized_user.current_order_playList = str(order_playList)
+        authorized_user.current_track_info = str(order_playList[0])
         authorized_user.current_ind_track = 0
         
     if form_actions_playList.random_order_playList.data:
         print("random")
-        order_playList = eval(authorized_user.playList)
+        order_playList = eval(authorized_user.playList)[::-1]
         if not order_playList:
             return None
         shuffle(order_playList)
-        authorized_user.current_order_playList = str(order_playList[::-1])
-        authorized_user.current_track_info = str(order_playList[::-1][0])
+        authorized_user.current_order_playList = str(order_playList)
+        authorized_user.current_track_info = str(order_playList[0])
         authorized_user.current_ind_track = 0
 
     db_sess.commit()
@@ -346,7 +352,6 @@ def processing_playList_actions(form_actions_playList, authorized_user, db_sess)
 
 
 def processing_tracks_actions(form_actions_tracks, authorized_user, db_sess):
-    print(99999999999999999999)
     if form_actions_tracks.next_track.data:
         print("next")
         order_playList = eval(authorized_user.current_order_playList)
@@ -356,18 +361,18 @@ def processing_tracks_actions(form_actions_tracks, authorized_user, db_sess):
         if authorized_user.current_ind_track >= len(order_playList):
             authorized_user.current_ind_track = 0
         ind_track = authorized_user.current_ind_track
-        authorized_user.current_track_info = str(order_playList[::-1][ind_track])
+        authorized_user.current_track_info = str(order_playList[ind_track])
         
     if form_actions_tracks.back_track.data:
         print("back")
         order_playList = eval(authorized_user.current_order_playList)
         if not order_playList:
             return None
-        if authorized_user.current_ind_track <= 0:
-            authorized_user.current_ind_track = len(order_playList)
         authorized_user.current_ind_track -= 1
+        if authorized_user.current_ind_track < 0:
+            authorized_user.current_ind_track = len(order_playList) - 1
         ind_track = authorized_user.current_ind_track
-        authorized_user.current_track_info = str(order_playList[::-1][ind_track])
+        authorized_user.current_track_info = str(order_playList[ind_track])
 
     db_sess.commit()
     return None

@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@300&family=Ubuntu:ital@1&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="/static/css/base.css">
+    <link rel="stylesheet" href="/static/css/music_block.css">
     <link rel="icon" href="/static/img/icon2.png">
 
     {% block links %}{% endblock %}
@@ -34,7 +35,7 @@
     {% if found_people %}
     <div class="search_people_output">
       <h4>search_people_output</h4>
-      <a href="/" class="btn btn-light">назад</a>
+      <a href="/" class="btn btn-light">Назад</a>
       <div class="people">
         {% for people in found_people %}
         <div class="men">
@@ -91,6 +92,35 @@
     <p></p>
     <a href="/chats" class="btn btn-light btn-sm"><h5>Чаты</h5></a><br>
   </div>
+  {% if form_music %}
+  <div class="music_block">
+      <div class="search_and_actions_playList_block">
+        <form action="" method="post">
+          {{ form_music.hidden_tag() }}
+          <div class="search_block">
+            {{ form_music.input_music(class="form-control input_music", type="text") }}
+            {{ form_music.btn_search(type="submit", class="btn btn_search") }}
+          </div>
+        </form>
+        <form action="" method="post">
+          {{ form_actions_playList.hidden_tag() }}
+          <div class="actions_with_playlist_block">
+            {{ form_actions_playList.add_playList(type="submit", class="btn btn_add") }}
+            {{ form_actions_playList.direct_order_playList(type="submit", class="btn btn_direct_order") }}
+            {{ form_actions_playList.random_order_playList(type="submit", class="btn btn_random_order") }}
+          </div>
+        </form>
+      </div>
+      <form action="" method="post">
+        {{ form_actions_tracks.hidden_tag() }}
+        <div class="actions_with_tracks_block">
+          {{ form_actions_tracks.back_track(type="submit", class="btn back_track") }}
+          {{ form_actions_tracks.next_track(type="submit", class="btn next_track") }}
+        </div>
+        <audio controls="controls" {% if autoplay %}autoplay="autoplay"{% endif %} src="{{ src_music }}"></audio>
+      </form>
+  </div>
+  {% endif %}
 
   <div class="playList">
     <h4>PlayList</h4>
@@ -98,7 +128,7 @@
       {% for track in playList %}
       <form class="" action="" method="post">
         <div class="form_track">
-          <input type="text" class="name_track" name="name_track" value="{{ track[0] }} {{ track[1] }}">
+          <input type="text" class="name_track" name="name_track" value="{{ track[0] }}<;>{{ track[1] }}">
           <button type="submit" name="btn_track" id="btn_track" class="btn">
             <div class="btn_track_div">
               <img src="{{ track[2] }}" alt="img_track">

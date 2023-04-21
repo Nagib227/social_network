@@ -6,14 +6,14 @@
 
 {% block content %}
     <div class="block_main">
-        <div class="row">
-            <div class="col-4"><div class="photo"><img src="{{ profile_user.way_profile_img }}" alt=""></div></div>
-            <div class="col-8"><div class="info">
+        <div class="photo_and_info">
+            <div class="photo"><img src="{{ profile_user.way_profile_img }}" alt=""></div>
+            <div class="info">
                 <h3>{{ profile_user.surname }} {{ profile_user.name }}</h3>
                 <h4>age - {{ profile_user.age }}</h4>
                 <h5>num_phone - {{ profile_user.num_phone }}</h5>
                 <h5>address - {{ profile_user.address }}</h5>
-            </div></div>
+            </div>
         </div>
         {% if change %}
         <div class="link1">

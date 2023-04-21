@@ -18,9 +18,10 @@ header {
   width: 100%;
   height: 100px;
   z-index: 10;
-  display: flex;
   align-items: center;
 }
+
+
 
 header .logo img {
   border-radius: 50px;
@@ -304,5 +305,47 @@ audio::-webkit-media-controls-current-time-display {
     top: 100px;
     width: 40%;
     left: 30%;
+}
 
+.music_block {
+  padding: 0.2%;
+  background-color: #EDDDBA;
+  border: 2px solid #BD9A7A;
+  border-radius: 10px;
+  position: fixed;
+  top: 345px;
+  left: 9%;
+  width: 20.5%;
+  display: none;
+}
+
+@media screen and (max-width: 1850px) {
+  .music {
+    right: 2%;
+  }
+  header .logo img {
+    left: 10%;
+  }
+}
+
+@media screen and (max-width: 1340px) {
+  .music {
+    display: none;
+  }
+  .music_block {
+    display: block;
+  }
+  .block_1 {
+    left: 9%;
+    width: 20.5%;
+  }
+  .playList {
+    width: 29%;
+  }
+  .search_top {
+    left: 60%;
+  }
+  .search_people_output {
+    left: 56%;
+  }
 }
