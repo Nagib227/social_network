@@ -26,11 +26,32 @@
         <img src="/static/img/logo2.png" alt="logo">
     </div>
     <div class="search_top">
-        <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="search" placeholder="Поиск людей">
-        <button class="btn btn-light">Поиск</button>
-        </form>
+      <form class="form-inline my-2 my-lg-0" action="" method="post">
+        <input class="form-control mr-sm-2" type="search" name="search_people_query" placeholder="Поиск людей">
+        <button class="btn btn-light search_people" name="search_people_btn">Поиск</button>
+      </form>
     </div>
+    {% if found_people %}
+    <div class="search_people_output">
+      <h4>search_people_output</h4>
+      <a href="/" class="btn btn-light">назад</a>
+      <div class="people">
+        {% for people in found_people %}
+        <div class="men">
+          <a href="/profile/{{ people.id }}">
+            <div class="people_info_and_img">
+              <img src="{{ people.way_profile_img }}" alt="profile_img">
+              <div class="people_info">
+                <h5>{{ people.surname }} {{ people.name }}</h5>
+                <h6>{{ people.email }}</h6>
+              </div>
+            </div>
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
     {% if form_music %}
     <div class="music">
       <div class="search_and_actions_playList">
@@ -63,37 +84,37 @@
 </header>
 
 <div class="block">
-    <div class="block_1">
-        <a href="/profile/{{ current_user.id }}" class="btn btn-light btn-sm"><h5>Мой профиль</h5></a><br>
-        <p></p>
-        <a href="/news" class="btn btn-light btn-sm"><h5>Новости</h5></a><br>
-        <p></p>
-        <a href="/chats" class="btn btn-light btn-sm"><h5>Чаты</h5></a><br>
-    </div>
+  <div class="block_1">
+    <a href="/profile/{{ current_user.id }}" class="btn btn-light btn-sm"><h5>Мой профиль</h5></a><br>
+    <p></p>
+    <a href="/news" class="btn btn-light btn-sm"><h5>Новости</h5></a><br>
+    <p></p>
+    <a href="/chats" class="btn btn-light btn-sm"><h5>Чаты</h5></a><br>
+  </div>
 
-    <div class="playList">
-      <h4>PlayList</h4>
-      <div class="tracks">
-        {% for track in playList %}
-        <form class="" action="" method="post">
-          <div class="form_track">
-            <input type="text" class="name_track" name="name_track" value="{{ track[0] }} {{ track[1] }}">
-            <button type="submit" name="btn_track" id="btn_track">
-              <div class="btn_track_div">
-                <img src="{{ track[2] }}" alt="img_track">
-                <div class="track_info">
-                  <h5>{{ track[0] }}</h5>
-                  <h7>{{ track[1] }}</h7>
-                </div>
+  <div class="playList">
+    <h4>PlayList</h4>
+    <div class="tracks">
+      {% for track in playList %}
+      <form class="" action="" method="post">
+        <div class="form_track">
+          <input type="text" class="name_track" name="name_track" value="{{ track[0] }} {{ track[1] }}">
+          <button type="submit" name="btn_track" id="btn_track" class="btn">
+            <div class="btn_track_div">
+              <img src="{{ track[2] }}" alt="img_track">
+              <div class="track_info">
+                <h5>{{ track[0] }}</h5>
+                <h6>{{ track[1] }}</h6>
               </div>
-            </button>
-          </div>
-        </form>
-        {% endfor %}
-      </div>
+            </div>
+          </button>
+        </div>
+      </form>
+      {% endfor %}
     </div>
+  </div>
 
-    {% block content %}{% endblock %}
+  {% block content %}{% endblock %}
 
 </div>
 </body>
