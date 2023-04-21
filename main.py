@@ -174,9 +174,22 @@ def save_img_profile(file, authorized_user, db_sess):
     db_sess.commit()
 
 
-@app.route('/chat/<chat_id>')
-@app.route('/chat')
-def chat1(chat_id=3):
+@app.route('/chat/<chat_id>', methods=['GET', 'POST'])
+@app.route('/chat', methods=['GET', 'POST'])
+def chat(chat_id=3):
+    if request.method == 'POST':
+        input_message = request.form.get("input_message", False)
+        if input_message:
+            print("push_message")
+            print(input_message)
+            ##################################################################################################
+            # input_message - строка которую пользователь ввёл в поле ввода для сообшений
+            # засунь весь код в какую-нибудь функцию
+            # типо этой:
+            # processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
+            ##################################################################################################
+
+            
     return render_template('chat.html')
 
 

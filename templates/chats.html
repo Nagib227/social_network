@@ -4,7 +4,7 @@
     {% set chats = [{"name": "1", "members": "haglhbglagba;buig augb;ergi aаырыкурыурвырыупвыпуыпыпыуапмроамфмалфыиалфоыиалфлыоирлф оымаорфым афрма рфымарjhb;g"}, {"name": "2", "members": "haglhbglagba;buig a aаырыкурыурвырыупвыпуыпыпыуапмроамфмалфыиалф aаырыкурыурвырыупвыпуыпыпыуапмроамфмалфыиалфugb;ergi ajhb;g"}, {"name": "1", "members": "haglhbglagba;buig augb;ergi ajhb;g"}, {"name": "2", "members": "haglhbglagba;buig augb;ergi ajhb;g"}, {"name": "1", "members": "haglhbglagba;buig augb;ergi ajhb;g"}, {"name": "2", "members": "haglhbglagba;buig augb;ergi ajhb;g"}, {"name": "1", "members": "haglhbglagba;buig augb;ergi ajhb;g"}, {"name": "2", "members": "haglhbglagba;buig augb;ergi ajhb;g"}, {"name": "1", "members": "haglhbglagba;buig augb;ergi ajhb;g"}, {"name": "2", "members": "haglhbglagba;buig augb;ergi ajhb;g"}] %}
     {% for item in chats %}
     <div class="block_main">
-        <a href="{{ url_for('chat1', chat_id=item['name']) }}"><h4>{{item["name"]}}</h4></a>
+        <a href="{{ url_for('chat', chat_id=item['name']) }}"><h4>{{item["name"]}}</h4></a>
         {% if item["members"]|length >= 40 %}
         {{item["members"][:40] + '...'}}
         {%else%}

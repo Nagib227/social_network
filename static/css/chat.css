@@ -32,3 +32,8 @@
     width: 100%;
 }
 
+.sender .input_and_btn {
+  display: inline-flex;
+  width: 100%;
+  max-height: 40px;
+}
