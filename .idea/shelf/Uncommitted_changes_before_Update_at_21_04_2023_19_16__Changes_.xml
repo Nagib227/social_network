@@ -1,0 +1,9 @@
+<changelist name="Uncommitted_changes_before_Update_at_21_04_2023_19_16_[Changes]" date="1682093778675" recycled="true" deleted="true">
+  <option name="PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_21_04_2023_19_16_[Changes]/shelved.patch" />
+  <option name="DESCRIPTION" value="Uncommitted changes before Update at 21.04.2023 19:16 [Changes]" />
+  <binary>
+    <option name="BEFORE_PATH" value="db/social_network.db" />
+    <option name="AFTER_PATH" value="db/social_network.db" />
+    <option name="SHELVED_PATH" value="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_21_04_2023_19_16_[Changes]/social_network.db" />
+  </binary>
+</changelist>
