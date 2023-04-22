@@ -179,17 +179,22 @@ def save_img_profile(file, authorized_user, db_sess):
 def chat(chat_id):
     db_sess = db_session.create_session()
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
-    cur_chat = db_sess.query(Chats).filter(Chats.id == chat_id).first()
-    # print("fhghgkjgglgj;a;gha", cur_chat.id)
 
-    # if isinstance(chat, list):
-    #     users = chat_id
-    #     chat_id = db_sess.query(chats.id).filter(or_(', '.join([users[0].email, users[1].email]) == chats.members),
-    #                                              ', '.join([users[1].email, users[0].email]) == chats.members).first()
-    #     print(chat_id)
-    #     if chat_id:
-    #         return redirect(f'/chat/{chat_id}')
-    # else:
+    if 'd' in chat_id:
+        members = chat_id.split('d')
+        print(members)
+        chat_id = db_sess.query(Chats.id).filter(or_(', '.join([members[0], members[1]]) == Chats.members,
+                                                 ', '.join([members[1], members[0]]) == Chats.members)).first()[0]
+        print(chat_id)
+        if chat_id:
+            return redirect(f'/chat/{chat_id}')
+        else:
+            create_chat(members[0], members, db_sess)
+            chat_id = db_sess.query(Chats.id).filter(or_(', '.join([members[0], members[1]]) == Chats.members,
+                                                     ', '.join([members[1], members[0]]) == Chats.members)).first()[0]
+            print(', '.join([members[0], members[1]]))
+            print(chat_id)
+            return redirect(f'/chat/{chat_id}')
 
     if request.method == 'POST':
         input_message = request.form.get("input_message", False)
@@ -198,12 +203,6 @@ def chat(chat_id):
             print(input_message)
             print(authorized_user.id, input_message, db_sess)
             create_message(authorized_user.id, input_message, chat_id, db_sess)
-            ##################################################################################################
-            # input_message - строка которую пользователь ввёл в поле ввода для сообшений
-            # засунь весь код в какую-нибудь функцию
-            # типо этой:
-            # processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
-            ##################################################################################################
 
     messages = db_sess.query(User.id, User.name, User.surname, Message.message, Message.creat_date) \
         .filter(Message.chat_id == chat_id).join(User, User.id == Message.creator_id).all()
@@ -238,7 +237,8 @@ def chats():
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
 
     chats = db_sess.query(Chats.name, Chats.members, Chats.id) \
-        .filter(or_(Chats.members.like(f'% {authorized_user.id},%'), Chats.members.like(f'{authorized_user.id},%'))).all()
+        .filter(
+        or_(Chats.members.like(f'% {authorized_user.id},%'), Chats.members.like(f'{authorized_user.id},%'))).all()
     print(chats)
     ready_chats = []
 
@@ -469,10 +469,10 @@ def processing_form_change(form_change, authorized_user, db_sess):
 def create_chat(creator_id, members, db_sess, name='личный'):
     if len(members) > 2:
         name = 'групповой'
-    chat = Chats(name=name,
-                 creator=creator_id,
-                 members=', '.join(members))
-    db_sess.add(chat)
+    new_chat = Chats(name=name,
+                     creator=creator_id,
+                     members=', '.join(members))
+    db_sess.add(new_chat)
     db_sess.commit()
 
 
