@@ -56,21 +56,23 @@
     {% if form_music %}
     <div class="music">
       <div class="search_and_actions_playList">
-        <form action="" method="post">
-          {{ form_music.hidden_tag() }}
-          <div class="search">
-            {{ form_music.input_music(class="form-control input_music", type="text") }}
-            {{ form_music.btn_search(type="submit", class="btn btn_search") }}
-          </div>
-        </form>
-        <form action="" method="post">
-          {{ form_actions_playList.hidden_tag() }}
-          <div class="actions_with_playlist">
-            {{ form_actions_playList.add_playList(type="submit", class="btn btn_add") }}
-            {{ form_actions_playList.direct_order_playList(type="submit", class="btn btn_direct_order") }}
-            {{ form_actions_playList.random_order_playList(type="submit", class="btn btn_random_order") }}
-          </div>
-        </form>
+        <div class="row">
+          <form action="" method="post">
+            {{ form_music.hidden_tag() }}
+            <div class="search">
+              {{ form_music.input_music(class="form-control input_music", type="text") }}
+              {{ form_music.btn_search(type="submit", class="btn btn_search") }}
+            </div>
+          </form>
+          <form action="" method="post">
+            {{ form_actions_playList.hidden_tag() }}
+            <div class="actions_with_playlist">
+              {{ form_actions_playList.add_playList(type="submit", class="btn btn_add") }}
+              {{ form_actions_playList.direct_order_playList(type="submit", class="btn btn_direct_order") }}
+              {{ form_actions_playList.random_order_playList(type="submit", class="btn btn_random_order") }}
+            </div>
+          </form>
+        </div>
       </div>
       <form action="" method="post">
         {{ form_actions_tracks.hidden_tag() }}
