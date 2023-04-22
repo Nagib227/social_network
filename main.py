@@ -23,12 +23,9 @@ from forms.actions_with_playList import ActionsWithPlayList
 from forms.change_profile import FormChangeProfile
 from werkzeug.utils import secure_filename
 
-
 from data.VARIABLES import LOGIN, PASSWORD, ALLOWED_EXTENSIONS
 
 from random import shuffle
-
-
 
 app = Flask(__name__)
 api = Api(app)
@@ -56,13 +53,13 @@ def news():
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
 
     form_music, form_actions_playList, form_actions_tracks = creat_forms_music()
-    
+
     if form_music.validate_on_submit():
         processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
 
     if form_actions_playList.validate_on_submit():
         processing_playList_actions(form_actions_playList, authorized_user, db_sess)
-            
+
     if form_actions_tracks.validate_on_submit():
         processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
 
@@ -79,7 +76,7 @@ def news():
 
     cur_track = get_current_track(authorized_user)
     ready_news = get_news(authorized_user, db_sess)
-     
+
     return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'),
                            form_music=form_music,
                            form_actions_playList=form_actions_playList,
@@ -99,19 +96,19 @@ def add_news(text_news, creator_id):
         creator_id=creator_id)
     db_sess.add(news)
     db_sess.commit()
-    
+
 
 @app.route('/profile/<int:profile_id>', methods=['GET', 'POST'])
 def profile(profile_id):
     if not current_user.is_authenticated:
         return redirect('/login')
-    
+
     autoplay = ""
     found_people = ""
     message = ""
 
     change = profile_id == current_user.id
-    
+
     db_sess = db_session.create_session()
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
     profile_user = db_sess.query(User).filter(User.id == profile_id).first()
@@ -119,13 +116,13 @@ def profile(profile_id):
     form_change = FormChangeProfile()
 
     form_music, form_actions_playList, form_actions_tracks = creat_forms_music()
-    
+
     if form_music.validate_on_submit():
         processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
 
     if form_actions_playList.validate_on_submit():
         processing_playList_actions(form_actions_playList, authorized_user, db_sess)
-            
+
     if form_actions_tracks.validate_on_submit():
         processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
 
@@ -145,9 +142,9 @@ def profile(profile_id):
 
     cur_track = get_current_track(authorized_user)
     profile_news = get_news(authorized_user, db_sess, filter_user=True)
-    
+
     form_change = put_values_in_form_change(form_change, profile_user)
-     
+
     return render_template('profile.html', link_logo=url_for('static', filename='img/logo.png'),
                            form_music=form_music,
                            form_actions_playList=form_actions_playList,
@@ -163,10 +160,12 @@ def profile(profile_id):
                            form_change=form_change,
                            message=message)
 
+
 def allowed_file(filename):
     """ Функция проверки расширения файла """
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 def save_img_profile(file, authorized_user, db_sess):
     file.save(f"static/img_profiles/{authorized_user.id}.png")
@@ -204,7 +203,7 @@ def chat(chat_id):
             # processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
             ##################################################################################################
 
-    messages = db_sess.query(User.name, User.surname, Message.message, Message.creat_date)\
+    messages = db_sess.query(User.name, User.surname, Message.message, Message.creat_date) \
         .filter(Message.chat_id == cur_chat.id).join(User, User.id == Message.creator_id)
 
     # осталось только доделать вывод сообщений, остальное готово
@@ -217,7 +216,7 @@ def chats():
     db_sess = db_session.create_session()
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
 
-    chats = db_sess.query(Chats.name, Chats.members, Chats.id)\
+    chats = db_sess.query(Chats.name, Chats.members, Chats.id) \
         .filter(Chats.members.like(f'% {authorized_user.email}%')).all()
     print(chats)
     ready_chats = []
@@ -276,12 +275,12 @@ def login():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
-            login_user(user, remember=True) # зарегистрированный user # current_user
+            login_user(user, remember=True)  # зарегистрированный user # current_user
             return redirect(f"/news")
         return render_template('login.html',
-                                title='Авторизация',
-                                message="Неправильный логин или пароль",
-                                form=form)
+                               title='Авторизация',
+                               message="Неправильный логин или пароль",
+                               form=form)
     return render_template('login.html', title='Авторизация', form=form)
 
 
@@ -297,6 +296,7 @@ def creat_forms_music():
     form_actions_tracks = ActionsWithTracks()
     return form_music, form_actions_playList, form_actions_tracks
 
+
 def get_current_track(authorized_user):
     cur_track = ""
     if authorized_user.current_track_info:
@@ -309,10 +309,10 @@ def get_current_track(authorized_user):
 def get_news(authorized_user, db_sess, filter_user=None):
     if filter_user:
         prenews = db_sess.query(User.name, User.surname, News.text, News.creation_date) \
-                  .filter(News.creator_id == authorized_user.id).join(User, User.id == News.creator_id).all()
+            .filter(News.creator_id == authorized_user.id).join(User, User.id == News.creator_id).all()
     else:
-        prenews = db_sess.query(User.name, User.surname, News.text, News.creation_date)\
-                  .join(User, User.id == News.creator_id).all()
+        prenews = db_sess.query(User.name, User.surname, News.text, News.creation_date) \
+            .join(User, User.id == News.creator_id).all()
 
     ready_news = []
     for new in prenews:
@@ -339,7 +339,7 @@ def processing_search_people(search_people):
     print("search_people")
     db_sess = db_session.create_session()
     all_users = db_sess.query(User).all()
-    found_people = list(filter(lambda x: (search_people.lower() in f"{x.surname.lower()} {x.name.lower()}" or\
+    found_people = list(filter(lambda x: (search_people.lower() in f"{x.surname.lower()} {x.name.lower()}" or
                                           search_people.lower() in f"{x.name.lower()} {x.surname.lower()}"), all_users))
     return found_people
 
@@ -354,9 +354,9 @@ def processing_search_music(form_music=None, name_track="", authorized_user=None
     if name_track:
         print("name_track")
         name_track = name_track.split("<;>")
-        title_artist_imgUrl_nameFile = list(filter(lambda x: name_track[0] in x and\
-                                                   name_track[1] in x, order_playList))[0]
-        
+        title_artist_imgUrl_nameFile = list(filter(lambda x: name_track[0] in x and \
+                                                             name_track[1] in x, order_playList))[0]
+
     authorized_user.current_order_playList = str(order_playList)
     authorized_user.current_track_info = str(title_artist_imgUrl_nameFile)
     authorized_user.current_ind_track = order_playList.index(title_artist_imgUrl_nameFile)
@@ -372,7 +372,7 @@ def processing_playList_actions(form_actions_playList, authorized_user, db_sess)
         if not title_artist_imgUrl_nameFile in playList:
             playList.append(title_artist_imgUrl_nameFile)
             authorized_user.playList = str(playList)
-            
+
     if form_actions_playList.direct_order_playList.data:
         print("direct")
         order_playList = eval(authorized_user.playList)[::-1]
@@ -381,7 +381,7 @@ def processing_playList_actions(form_actions_playList, authorized_user, db_sess)
         authorized_user.current_order_playList = str(order_playList)
         authorized_user.current_track_info = str(order_playList[0])
         authorized_user.current_ind_track = 0
-        
+
     if form_actions_playList.random_order_playList.data:
         print("random")
         order_playList = eval(authorized_user.playList)[::-1]
@@ -407,7 +407,7 @@ def processing_tracks_actions(form_actions_tracks, authorized_user, db_sess):
             authorized_user.current_ind_track = 0
         ind_track = authorized_user.current_ind_track
         authorized_user.current_track_info = str(order_playList[ind_track])
-        
+
     if form_actions_tracks.back_track.data:
         print("back")
         order_playList = eval(authorized_user.current_order_playList)
@@ -425,7 +425,7 @@ def processing_tracks_actions(form_actions_tracks, authorized_user, db_sess):
 
 def processing_form_change(form_change, authorized_user, db_sess):
     message = ""
-    
+
     authorized_user.surname = form_change.surname.data
     authorized_user.name = form_change.name.data
     try:
