@@ -317,7 +317,7 @@ audio::-webkit-media-controls-current-time-display {
   border: 2px solid #BD9A7A;
   border-radius: 10px;
   position: fixed;
-  top: 345px;
+  top: 400px;
   left: 9%;
   width: 20.5%;
   display: none;
