@@ -204,7 +204,7 @@ def chat(chat_id):
             ##################################################################################################
 
     messages = db_sess.query(User.name, User.surname, Message.message, Message.creat_date) \
-        .filter(Message.chat_id == cur_chat.id).join(User, User.id == Message.creator_id)
+        .filter(Message.chat_id == cur_chat[0]).join(User, User.id == Message.creator_id)
 
     # осталось только доделать вывод сообщений, остальное готово
 
