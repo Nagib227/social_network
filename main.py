@@ -67,6 +67,8 @@ def news():
         name_track = request.form.get("name_track", False)
         search_people_query = request.form.get("search_people_query", False)
         text_news = request.form.get("text_news", False)
+        print(request.form)
+        print(text_news, search_people_query,name_track)
         if name_track:
             processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
         if search_people_query:
@@ -161,7 +163,7 @@ def profile(profile_id):
                            message=message)
 
 
-@app.route('/chat/<int:chat_id>', methods=['GET', 'POST'])
+@app.route('/chat/<chat_id>', methods=['GET', 'POST'])
 def chat(chat_id):
     if not current_user.is_authenticated:
         return redirect('/login')
@@ -170,13 +172,28 @@ def chat(chat_id):
     found_people = ""
 
     db_sess = db_session.create_session()
+
+    if 'd' in chat_id:
+        members = chat_id.split('d')
+        print(chat_id)
+        chat_id = db_sess.query(Chats.id).filter(or_(', '.join(members) == Chats.members,
+                                                     ', '.join(members[::-1]) == Chats.members)).first()
+        if chat_id:
+            chat_id = chat_id[0]
+            return redirect(f'/chat/{chat_id}')
+        else:
+            create_chat(members[0], members)
+            chat_id = db_sess.query(Chats.id).filter(or_(', '.join(members) == Chats.members,
+                                                         ', '.join(members[::-1]) == Chats.members)).first()[0]
+            return redirect(f'/chat/{chat_id}')
+
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
     cur_chat = db_sess.query(Chats).filter(Chats.id == chat_id).first()
     
     is_member = current_user.id in eval(cur_chat.members)
 
     if not is_member:
-        abort(404)
+        return redirect('/chats')
 
     form_music, form_actions_playList, form_actions_tracks = creat_forms_music()
 
@@ -242,13 +259,10 @@ def chats():
     if request.method == 'POST':
         name_track = request.form.get("name_track", False)
         search_people_query = request.form.get("search_people_query", False)
-        input_message = request.form.get("input_message", False)
         if name_track:
             processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
         if search_people_query:
             found_people = processing_search_people(search_people=search_people_query)
-        if input_message:
-            create_message(authorized_user.id, input_message, chat_id)
 
     cur_track = get_current_track(authorized_user)
     ready_chats = get_chats(authorized_user)
@@ -322,6 +336,9 @@ def load_user(user_id):
 
 @app.route('/reviews', methods=['GET', 'POST'])
 def reviews():
+    if not current_user.is_authenticated:
+        return redirect('/login')
+    
     autoplay = ""
     found_people = ""
 
@@ -422,14 +439,17 @@ def get_news(authorized_user, filter_user=None):
 
 def get_chats(authorized_user):
     db_sess = db_session.create_session()
-    chats = db_sess.query(Chats.name, Chats.members, Chats.id) \
-        .filter(or_(Chats.members.like(f'% {authorized_user.id},%'), Chats.members.like(f'{authorized_user.id},%'))).all()
+    chats = db_sess.query(Chats.name, Chats.members, Chats.id)\
+        .filter(or_(Chats.members.like(f'% {authorized_user.id},%'), Chats.members.like(f'{authorized_user.id},%'),
+                    Chats.members.like(f'% {authorized_user.id}'))).all()
+    print(chats)
     ready_chats = []
 
     for chat in chats:
         if chat[0] == 'личный':
             members = chat[1].split(', ')
-            if authorized_user.email == members[0]:
+
+            if authorized_user.id == int(members[0]):
                 person_id = members[1]
             else:
                 person_id = members[0]
