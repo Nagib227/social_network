@@ -161,7 +161,7 @@ def profile(profile_id):
                            message=message)
 
 
-@app.route('/chat/<int:chat_id>', methods=['GET', 'POST'])
+@app.route('/chat/<chat_id>', methods=['GET', 'POST'])
 def chat(chat_id):
     if not current_user.is_authenticated:
         return redirect('/login')
@@ -170,6 +170,19 @@ def chat(chat_id):
     found_people = ""
 
     db_sess = db_session.create_session()
+
+    if 'd' in chat_id:
+        members = chat_id.split('d')
+        chat_id = db_sess.query(Chats.id).filter(or_(', '.join([members[0], members[1]]) == Chats.members,
+                                                 ', '.join([members[1], members[0]]) == Chats.members)).first()[0]
+        if chat_id:
+            return redirect(f'/chat/{chat_id}')
+        else:
+            create_chat(members[0], members)
+            chat_id = db_sess.query(Chats.id).filter(or_(', '.join([members[0], members[1]]) == Chats.members,
+                                                     ', '.join([members[1], members[0]]) == Chats.members)).first()[0]
+            return redirect(f'/chat/{chat_id}')
+
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
     cur_chat = db_sess.query(Chats).filter(Chats.id == chat_id).first()
     
@@ -322,6 +335,9 @@ def load_user(user_id):
 
 @app.route('/reviews', methods=['GET', 'POST'])
 def reviews():
+    if not current_user.is_authenticated:
+        return redirect('/login')
+    
     autoplay = ""
     found_people = ""
 

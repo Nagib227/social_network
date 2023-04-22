@@ -76,6 +76,7 @@ header .logo img {
 .search_people_output .people .men a .people_info_and_img {
   width: 100%;
   display: inline-flex;
+  padding: 4px;
 }
 
 .search_people_output .people .men a .people_info_and_img img {
@@ -101,7 +102,7 @@ header .logo img {
 }
 
 .music .search_and_actions_playList {
-
+  display: inline-flex;
 }
 
 .music .search {
@@ -148,10 +149,10 @@ header .logo img {
   background-image: url(../img/add_playList_2.png);
   background-repeat: no-repeat;
   background-position: center center;
-  background-size: 48px 40px;
-  margin: 7px 0 0 5px;
-  width: 40px;
-  height: 32px;
+  background-size: 50px 41px;
+  margin: 3px 0 0 5px;
+  width: 50px;
+  height: 37px;
 }
 
 .music .actions_with_playlist .btn_direct_order {
@@ -159,19 +160,19 @@ header .logo img {
   background-repeat: no-repeat;
   background-position: center center;
   background-size: 35px 35px;
-  margin: 7px 0 0 0;
+  margin: 3px 0 0 0;
   width: 40px;
-  height: 32px;
+  height: 37px;
 }
 
 .music .actions_with_playlist .btn_random_order {
   background-image: url(../img/random_order.png);
   background-repeat: no-repeat;
   background-position: center center;
-  background-size: 56px 40px;
-  margin: 7px 0 0 0;
+  background-size: 50px 41px;
+  margin: 3px 0 0 0;
   width: 40px;
-  height: 32px;
+  height: 37px;
 }
 
 .music .actions_with_playlist .btn_add:focus,
