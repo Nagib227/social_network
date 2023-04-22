@@ -16,9 +16,32 @@
 }
 
 .messages_area{
+    padding: 10px 0;
     position: relative;
     height: 715px;
     max-height: 715px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column-reverse;
+    flex-wrap: nowrap;
+}
+
+.message{
+    margin: 10px 10px;
+    padding: 5px;
+    background-color: #f2dca7;
+    border: 2px solid #BD9A7A;
+    border-radius: 5px 20px 20px 5px;
+    max-width: 75%;
+
+}
+
+.message#other-message{
+    background-color: #ffffff;
+}
+
+.message#user-message{
+    background-color: 	#89CFF0;
 }
 
 .sender{
@@ -28,7 +51,7 @@
     border-top-color: #BD9A7A;
     border-top-style: solid;
     border-top-width: 2px;
-    height: 75px;
+    height: 50px;
     width: 100%;
 }
 
@@ -38,6 +61,6 @@
   max-height: 40px;
 }
 
-.sender.form-control{
-    max-height: 55px;
+.input_and_btn#floatingTextarea2{
+    min-height: 55px;
 }
