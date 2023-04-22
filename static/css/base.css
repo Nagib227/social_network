@@ -1,6 +1,7 @@
 body{
     padding: 0px;
     background-color: #F5E9CD;
+    font-family: helvetica neue, helvetica, arial, sans-serif;
 }
 
 body::-webkit-scrollbar {

@@ -8,41 +8,122 @@
 
 {% block content %}
 <div class="block_main info_about_developers">
-  <h2>Команда разработчиков лучшей хлебной соц. сети</h2>
+  <div class="animated-title">
+    <h2>
+      <span>Команда</span>
+      <span>разработчиков</span>
+      <span>лучшей</span>
+      <span>хлебной</span>
+      <span>социальной</span>
+      <span>сети</span>
+    </h2>
+  </div>
+  <div class="animated-text">
+    <h3>
+      <span>Почему</span>
+      <span>bread_network</span>
+      <span>?</span>
+      <span>Есть</span>
+      <span>легенда</span>
+      <span>что,</span>
+      <span>когда-то</span>
+      <span>команда</span>
+      <span>разработчиков</span>
+      <span>bread_network</span>
+      <span>разрабатывала</span>
+      <span>игру.</span>
+      <span>В</span>
+      <span>ходе</span>
+      <span>разработки</span>
+      <span>этого</span>
+      <span>проекта</span>
+      <span>один</span>
+      <span>из</span>
+      <span>разработчиков</span>
+      <span>опечатся</span>
+      <span>и</span>
+      <span>основной</span>
+      <span>класс</span>
+      <span>вместо</span>
+      <span>Board(игравое поле)</span>
+      <span>был</span>
+      <span>назван</span>
+      <span>Bread(хлеб).</span>
+      <span>Вы</span>
+      <span>спросите</span>
+      <span>откуда</span>
+      <span>я</span>
+      <span>это</span>
+      <span>знаю?</span>
+      <span>Этим</span>
+      <span>разработчиком</span>
+      <span>был</span>
+      <span>я...</span>
+    </h3>
+  </div>
   <div class="info_and_btns">
-    <div class="info_developer text-center">
-      <h2>Разработчик №1</h2>
-      <h3>|</h3>
-      <h3>|</h3>
-      <h3>|</h3>
-      <h3>|</h3>
-      <h3>\|/</h3>
-      <div class="wrap">
-        <button class="button">Написать отзыв</button>
+    <span>
+      <div class="info_developer text-center">
+        <h2>Разработчик №1</h2>
+        <h3>|</h3>
+        <h3>|</h3>
+        <h3>|</h3>
+        <h3>|</h3>
+        <h3>\|/</h3>
+        <div class="wrap">
+          <a href="https://yoomoney.ru/to/4100118164688774">
+            <button class="button">Написать отзыв</button>
+          </a>
+        </div>
       </div>
-    </div>
-    <div class="info_developer text-center">
-      <h2>Разработчик №2</h2>
-      <h3>|</h3>
-      <h3>|</h3>
-      <h3>|</h3>
-      <h3>|</h3>
-      <h3>\|/</h3>
-      <div class="wrap">
-        <button class="button">Написать отзыв</button>
+    </span>
+    <span>
+      <div class="info_developer text-center">
+        <h2>Разработчик №2</h2>
+        <h3>|</h3>
+        <h3>|</h3>
+        <h3>|</h3>
+        <h3>|</h3>
+        <h3>\|/</h3>
+        <div class="wrap">
+          <a href="https://yoomoney.ru/to/4100118180254290">
+            <button class="button">Написать отзыв</button>
+          </a>
+        </div>
       </div>
-    </div>
+    </span>
   </div>
   <div class="general_review">
-    <a href="#" class="animated-button1">
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      Написать отзыв всей команде
-    </a>
+    <span class="animated-general-review-span">
+      <a class="animated-button1" href="#">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <div class="content">
+          <div class="buttons">
+            <div id="six" class="button">Написать отзыв всей команде</div>
+          </div>
+        </div>
+      </a>
+    </span>
   </div>
 </div>
 
 
+<div id="modal-container">
+  <div class="modal-background">
+    <div class="modal">
+      <h2>Спасибо за отзыв!</h2>
+      <p>Если вы хотите, чтобы мы выслушали ваш отзыв, приходите 27 апреля в 15:30 по адресу г.Курск, КГУ, Факультет физики, математики, информатики,
+      аудитория 202</p>
+      <h2>И <b>обязательно</b> возмите 2 банки сгущёнки!</h2>
+      <svg class="modal-svg" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="none">
+        <rect x="0" y="0" fill="none" width="100%" height="100%" rx="3" ry="3"></rect>
+      </svg>
+    </div>
+  </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+<script src="/static/js/script.js"></script>
 {% endblock %}
