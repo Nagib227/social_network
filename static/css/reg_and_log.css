@@ -12,5 +12,9 @@ h1 {
     position: relative;
     width: 40%;
     left: 30%;
+}
 
+.pages{
+    position: relative;
+    left: 26%;
 }
