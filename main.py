@@ -77,7 +77,7 @@ def news():
     cur_track = get_current_track(authorized_user)
     ready_news = get_news(authorized_user, db_sess)
 
-    return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'),
+    return render_template('news.html',
                            form_music=form_music,
                            form_actions_playList=form_actions_playList,
                            form_actions_tracks=form_actions_tracks,
@@ -145,17 +145,17 @@ def profile(profile_id):
 
     form_change = put_values_in_form_change(form_change, profile_user)
 
-    return render_template('profile.html', link_logo=url_for('static', filename='img/logo.png'),
+    return render_template('profile.html',
                            form_music=form_music,
                            form_actions_playList=form_actions_playList,
                            form_actions_tracks=form_actions_tracks,
                            src_music=f'/static/music/wav/{cur_track}.wav',
                            autoplay=autoplay,
-                           authorized_user=authorized_user,
+                           current_user=current_user,
                            playList=eval(authorized_user.playList)[::-1],
+                           found_people=found_people,
                            profile_user=profile_user,
                            profile_news=profile_news,
-                           found_people=found_people,
                            change=change,
                            form_change=form_change,
                            message=message)
@@ -174,41 +174,66 @@ def save_img_profile(file, authorized_user, db_sess):
     db_sess.commit()
 
 
-@app.route('/chat/<chat_id>', methods=['GET', 'POST'])
-@app.route('/chat', methods=['GET', 'POST'])
+@app.route('/chat/<int:chat_id>', methods=['GET', 'POST'])
 def chat(chat_id):
+    if not current_user.is_authenticated:
+        return redirect('/login')
+
+    autoplay = ""
+    found_people = ""
+
     db_sess = db_session.create_session()
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
-    cur_chat = db_sess.query(Chats.id, Chats.name).filter(Chats.id == chat_id)
+    cur_chat = db_sess.query(Chats).filter(Chats.id == chat_id).first()
+    
+    is_member  = current_user.id in eval(cur_chat.members)
+    if not is_member:
+        abort(404)
 
-    # if isinstance(chat, list):
-    #     users = chat_id
-    #     chat_id = db_sess.query(chats.id).filter(or_(', '.join([users[0].email, users[1].email]) == chats.members),
-    #                                              ', '.join([users[1].email, users[0].email]) == chats.members).first()
-    #     print(chat_id)
-    #     if chat_id:
-    #         return redirect(f'/chat/{chat_id}')
-    # else:
+    form_music, form_actions_playList, form_actions_tracks = creat_forms_music()
 
+    if form_music.validate_on_submit():
+        processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
+
+    if form_actions_playList.validate_on_submit():
+        processing_playList_actions(form_actions_playList, authorized_user, db_sess)
+
+    if form_actions_tracks.validate_on_submit():
+        processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
+
+    if request.method == 'POST':
+        name_track = request.form.get("name_track", False)
+        search_people_query = request.form.get("search_people_query", False)
+        input_message = request.form.get("input_message", False)
+        if name_track:
+            processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
+        if search_people_query:
+            found_people = processing_search_people(search_people=search_people_query)
+        if input_message:
+            create_message(authorized_user.id, input_message, cur_chat.id)
+
+    cur_track = get_current_track(authorized_user)
+
+    print(is_member, "is_member")
     if request.method == 'POST':
         input_message = request.form.get("input_message", False)
         if input_message:
-            print("push_message")
-            print(input_message)
-            create_message(authorized_user.id, input_message, cur_chat.id, db_sess)
-            ##################################################################################################
-            # input_message - строка которую пользователь ввёл в поле ввода для сообшений
-            # засунь весь код в какую-нибудь функцию
-            # типо этой:
-            # processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
-            ##################################################################################################
+            create_message(authorized_user.id, input_message, cur_chat.id)
 
     messages = db_sess.query(User.name, User.surname, Message.message, Message.creat_date) \
-        .filter(Message.chat_id == cur_chat[0]).join(User, User.id == Message.creator_id)
-
+        .filter(Message.chat_id == cur_chat.id).join(User, User.id == Message.creator_id).all()
     # осталось только доделать вывод сообщений, остальное готово
 
-    return render_template('chat.html')
+    return render_template('chat.html',
+                           form_music=form_music,
+                           form_actions_playList=form_actions_playList,
+                           form_actions_tracks=form_actions_tracks,
+                           src_music=f'/static/music/wav/{cur_track}.wav',
+                           autoplay=autoplay,
+                           current_user=current_user,
+                           playList=eval(authorized_user.playList)[::-1],
+                           found_people=found_people,
+                           messages=messages)
 
 
 @app.route('/chats')
@@ -445,7 +470,8 @@ def processing_form_change(form_change, authorized_user, db_sess):
     return message
 
 
-def create_chat(creator_id, members, db_sess, name='личный'):
+def create_chat(creator_id, members, name='личный'):
+    db_sess = db_session.create_session()
     if len(members) > 2:
         name = 'групповой'
     chat = Chats(name=name,
@@ -455,7 +481,9 @@ def create_chat(creator_id, members, db_sess, name='личный'):
     db_sess.commit()
 
 
-def create_message(creator_id, text, chat_id, db_sess):
+def create_message(creator_id, text, chat_id):
+    print("push_message")
+    db_sess = db_session.create_session()
     message = Message(creator_id=creator_id,
                       message=text,
                       chat_id=chat_id)

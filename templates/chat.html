@@ -8,9 +8,15 @@
 
     <div class="block_main">
         <div class="hat"><h4 align="center">name_of_the_chat</h4></div>
-        <div class="messages_area"></div>
+        <div class="messages_area">
+          {% for message in messages %}
+          <div class="message">
+            
+          </div>
+          {% endfor %}
+        </div>
         <div class="sender">
-          <form class="" action="index.html" method="post">
+          <form class="" action="" method="post">
             <div class="input_and_btn">
               <textarea class="form-control" placeholder="Написать сообщение" id="floatingTextarea2" name="input_message"></textarea>
               <button type="submit" class="btn btn-primary" name="push_message">Отправить</button>
