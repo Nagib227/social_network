@@ -75,7 +75,7 @@ def news():
             add_news(text_news=text_news, creator_id=current_user.id)
 
     cur_track = get_current_track(authorized_user)
-    ready_news = get_news(authorized_user, db_sess)
+    ready_news = get_news(authorized_user)
 
     return render_template('news.html', link_logo=url_for('static', filename='img/logo.png'),
                            form_music=form_music,
@@ -141,11 +141,11 @@ def profile(profile_id):
             found_people = processing_search_people(search_people=search_people_query)
 
     cur_track = get_current_track(authorized_user)
-    profile_news = get_news(authorized_user, db_sess, filter_user=True)
+    profile_news = get_news(authorized_user, filter_user=True)
 
     form_change = put_values_in_form_change(form_change, profile_user)
 
-    return render_template('profile.html', link_logo=url_for('static', filename='img/logo.png'),
+    return render_template('profile.html',
                            form_music=form_music,
                            form_actions_playList=form_actions_playList,
                            form_actions_tracks=form_actions_tracks,
@@ -153,107 +153,116 @@ def profile(profile_id):
                            autoplay=autoplay,
                            authorized_user=authorized_user,
                            playList=eval(authorized_user.playList)[::-1],
+                           found_people=found_people,
                            profile_user=profile_user,
                            profile_news=profile_news,
-                           found_people=found_people,
                            change=change,
                            form_change=form_change,
                            message=message)
 
 
-def allowed_file(filename):
-    """ Функция проверки расширения файла """
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
-def save_img_profile(file, authorized_user, db_sess):
-    file.save(f"static/img_profiles/{authorized_user.id}.png")
-
-    authorized_user.way_profile_img = f"/static/img_profiles/{authorized_user.id}.png"
-    db_sess.commit()
-
-
-@app.route('/chat/<chat_id>', methods=['GET', 'POST'])
-@app.route('/chat', methods=['GET', 'POST'])
+@app.route('/chat/<int:chat_id>', methods=['GET', 'POST'])
 def chat(chat_id):
+    if not current_user.is_authenticated:
+        return redirect('/login')
+
+    autoplay = ""
+    found_people = ""
+
     db_sess = db_session.create_session()
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
+    cur_chat = db_sess.query(Chats).filter(Chats.id == chat_id).first()
+    
+    is_member = current_user.id in eval(cur_chat.members)
 
-    if 'd' in chat_id:
-        members = chat_id.split('d')
-        print(members)
-        chat_id = db_sess.query(Chats.id).filter(or_(', '.join([members[0], members[1]]) == Chats.members,
-                                                 ', '.join([members[1], members[0]]) == Chats.members)).first()[0]
-        print(chat_id)
-        if chat_id:
-            return redirect(f'/chat/{chat_id}')
-        else:
-            create_chat(members[0], members, db_sess)
-            chat_id = db_sess.query(Chats.id).filter(or_(', '.join([members[0], members[1]]) == Chats.members,
-                                                     ', '.join([members[1], members[0]]) == Chats.members)).first()[0]
-            print(', '.join([members[0], members[1]]))
-            print(chat_id)
-            return redirect(f'/chat/{chat_id}')
+    if not is_member:
+        abort(404)
+
+    form_music, form_actions_playList, form_actions_tracks = creat_forms_music()
+
+    if form_music.validate_on_submit():
+        processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
+
+    if form_actions_playList.validate_on_submit():
+        processing_playList_actions(form_actions_playList, authorized_user, db_sess)
+
+    if form_actions_tracks.validate_on_submit():
+        processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
 
     if request.method == 'POST':
+        name_track = request.form.get("name_track", False)
+        search_people_query = request.form.get("search_people_query", False)
         input_message = request.form.get("input_message", False)
+        if name_track:
+            processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
+        if search_people_query:
+            found_people = processing_search_people(search_people=search_people_query)
         if input_message:
-            print("push_message")
-            print(input_message)
-            print(authorized_user.id, input_message, db_sess)
-            create_message(authorized_user.id, input_message, chat_id, db_sess)
+            create_message(authorized_user.id, input_message, chat_id)
 
-    messages = db_sess.query(User.id, User.name, User.surname, Message.message, Message.creat_date) \
-        .filter(Message.chat_id == chat_id).join(User, User.id == Message.creator_id).all()
-
-    ready_messages = []
-    for message in messages:
-        if message[0] == authorized_user.id:
-            user = 1
-        else:
-            user = 0
-
-        name = f'{message[1]} {message[2]}'
-
-        time = ':'.join(str(message[4].time()).split('.')[0].split(':')[:-1])
-        date = str(message[4].date())
-        new_message = [user, name, message[3], f'{date}, {time}']
-        print(new_message)
-        ready_messages.append(new_message)
-
-    ready_messages.sort(key=lambda x: x[3], reverse=True)
-
-    # осталось только доделать вывод сообщений, остальное готово
+    cur_track = get_current_track(authorized_user)
+    ready_messages = get_messages(chat_id, authorized_user)
 
     return render_template('chat.html',
+                           form_music=form_music,
+                           form_actions_playList=form_actions_playList,
+                           form_actions_tracks=form_actions_tracks,
+                           src_music=f'/static/music/wav/{cur_track}.wav',
+                           autoplay=autoplay,
+                           authorized_user=authorized_user,
+                           playList=eval(authorized_user.playList)[::-1],
+                           found_people=found_people,
                            messages=ready_messages,
-                           name='личный')
+                           name=cur_chat.name)
 
 
-@app.route('/chats')
+@app.route('/chats', methods=['GET', 'POST'])
 def chats():
+    if not current_user.is_authenticated:
+        return redirect('/login')
+
+    autoplay = ""
+    found_people = ""
+
     db_sess = db_session.create_session()
     authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
 
-    chats = db_sess.query(Chats.name, Chats.members, Chats.id) \
-        .filter(
-        or_(Chats.members.like(f'% {authorized_user.id},%'), Chats.members.like(f'{authorized_user.id},%'))).all()
-    print(chats)
-    ready_chats = []
+    form_music, form_actions_playList, form_actions_tracks = creat_forms_music()
+    
 
-    for chat in chats:
-        if chat[0] == 'личный':
-            members = chat[1].split(', ')
-            if authorized_user.email == members[0]:
-                person_id = members[1]
-            else:
-                person_id = members[0]
-            name = ' '.join(db_sess.query(User.name, User.surname).filter(User.id == person_id).first())
-            chat = [name, ', '.join(members), chat[2]]
-        ready_chats.append(chat)
+    if form_music.validate_on_submit():
+        processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
 
-    return render_template('chats.html', chats=ready_chats)
+    if form_actions_playList.validate_on_submit():
+        processing_playList_actions(form_actions_playList, authorized_user, db_sess)
+
+    if form_actions_tracks.validate_on_submit():
+        processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
+
+    if request.method == 'POST':
+        name_track = request.form.get("name_track", False)
+        search_people_query = request.form.get("search_people_query", False)
+        input_message = request.form.get("input_message", False)
+        if name_track:
+            processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
+        if search_people_query:
+            found_people = processing_search_people(search_people=search_people_query)
+        if input_message:
+            create_message(authorized_user.id, input_message, chat_id)
+
+    cur_track = get_current_track(authorized_user)
+    ready_chats = get_chats(authorized_user)
+
+    return render_template('chats.html',
+                           form_music=form_music,
+                           form_actions_playList=form_actions_playList,
+                           form_actions_tracks=form_actions_tracks,
+                           src_music=f'/static/music/wav/{cur_track}.wav',
+                           autoplay=autoplay,
+                           authorized_user=authorized_user,
+                           playList=eval(authorized_user.playList)[::-1],
+                           found_people=found_people,
+                           chats=ready_chats)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -311,6 +320,69 @@ def load_user(user_id):
     return db_sess.get(User, user_id)
 
 
+@app.route('/reviews', methods=['GET', 'POST'])
+def reviews():
+    autoplay = ""
+    found_people = ""
+
+    db_sess = db_session.create_session()
+    authorized_user = db_sess.query(User).filter(User.id == current_user.id).first()
+
+    form_music, form_actions_playList, form_actions_tracks = creat_forms_music()
+
+    if form_music.validate_on_submit():
+        processing_search_music(form_music=form_music, authorized_user=authorized_user, db_sess=db_sess)
+
+    if form_actions_playList.validate_on_submit():
+        processing_playList_actions(form_actions_playList, authorized_user, db_sess)
+
+    if form_actions_tracks.validate_on_submit():
+        processing_tracks_actions(form_actions_tracks, authorized_user, db_sess)
+
+    if request.method == 'POST':
+        name_track = request.form.get("name_track", False)
+        search_people_query = request.form.get("search_people_query", False)
+        if name_track:
+            processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
+        if search_people_query:
+            found_people = processing_search_people(search_people=search_people_query)
+
+    cur_track = get_current_track(authorized_user)
+
+    
+    return render_template("reviews.html",
+                           form_music=form_music,
+                           form_actions_playList=form_actions_playList,
+                           form_actions_tracks=form_actions_tracks,
+                           src_music=f'/static/music/wav/{cur_track}.wav',
+                           autoplay=autoplay,
+                           authorized_user=authorized_user,
+                           playList=eval(authorized_user.playList)[::-1],
+                           found_people=found_people)
+
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def creat_forms_music():
     form_music = MusicForm()
     form_actions_playList = ActionsWithPlayList()
@@ -327,7 +399,8 @@ def get_current_track(authorized_user):
     return cur_track
 
 
-def get_news(authorized_user, db_sess, filter_user=None):
+def get_news(authorized_user, filter_user=None):
+    db_sess = db_session.create_session()
     if filter_user:
         prenews = db_sess.query(User.name, User.surname, News.text, News.creation_date) \
             .filter(News.creator_id == authorized_user.id).join(User, User.id == News.creator_id).all()
@@ -347,6 +420,47 @@ def get_news(authorized_user, db_sess, filter_user=None):
     return ready_news
 
 
+def get_chats(authorized_user):
+    db_sess = db_session.create_session()
+    chats = db_sess.query(Chats.name, Chats.members, Chats.id) \
+        .filter(or_(Chats.members.like(f'% {authorized_user.id},%'), Chats.members.like(f'{authorized_user.id},%'))).all()
+    ready_chats = []
+
+    for chat in chats:
+        if chat[0] == 'личный':
+            members = chat[1].split(', ')
+            if authorized_user.email == members[0]:
+                person_id = members[1]
+            else:
+                person_id = members[0]
+            name = ' '.join(db_sess.query(User.name, User.surname).filter(User.id == person_id).first())
+            chat = [name, ', '.join(members), chat[2]]
+        ready_chats.append(chat)
+    return ready_chats
+
+
+def get_messages(chat_id, authorized_user):
+    db_sess = db_session.create_session()
+    messages = db_sess.query(User.id, User.name, User.surname, Message.message, Message.creat_date) \
+        .filter(Message.chat_id == chat_id).join(User, User.id == Message.creator_id).all()
+
+    ready_messages = []
+    for message in messages:
+        user = 0
+        if message[0] == authorized_user.id:
+            user = 1
+
+        name = f'{message[1]} {message[2]}'
+
+        time = ':'.join(str(message[4].time()).split('.')[0].split(':')[:-1])
+        date = str(message[4].date())
+        new_message = [user, name, message[3], f'{date}, {time}']
+        ready_messages.append(new_message)
+
+    ready_messages.sort(key=lambda x: x[3], reverse=True)
+    return ready_messages
+
+
 def put_values_in_form_change(form_change, profile_user):
     form_change.surname.data = profile_user.surname
     form_change.name.data = profile_user.name
@@ -354,6 +468,19 @@ def put_values_in_form_change(form_change, profile_user):
     form_change.num_phone.data = profile_user.num_phone
     form_change.address.data = profile_user.address
     return form_change
+
+
+def allowed_file(filename):
+    """ Функция проверки расширения файла """
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+def save_img_profile(file, authorized_user, db_sess):
+    file.save(f"static/img_profiles/{authorized_user.id}.png")
+
+    authorized_user.way_profile_img = f"/static/img_profiles/{authorized_user.id}.png"
+    db_sess.commit()
 
 
 def processing_search_people(search_people):
@@ -466,7 +593,8 @@ def processing_form_change(form_change, authorized_user, db_sess):
     return message
 
 
-def create_chat(creator_id, members, db_sess, name='личный'):
+def create_chat(creator_id, members, name='личный'):
+    db_sess = db_session.create_session()
     if len(members) > 2:
         name = 'групповой'
     new_chat = Chats(name=name,
@@ -476,24 +604,13 @@ def create_chat(creator_id, members, db_sess, name='личный'):
     db_sess.commit()
 
 
-def create_message(creator_id, text, chat_id, db_sess):
+def create_message(creator_id, text, chat_id):
+    db_sess = db_session.create_session()
     message = Message(creator_id=creator_id,
                       message=text,
                       chat_id=chat_id)
     db_sess.add(message)
     db_sess.commit()
-
-
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect("/")
-
-
-@app.route('/reviews')
-def reviews():
-    return render_template("reviews.html")
 
 
 if __name__ == '__main__':
