@@ -67,8 +67,6 @@ def news():
         name_track = request.form.get("name_track", False)
         search_people_query = request.form.get("search_people_query", False)
         text_news = request.form.get("text_news", False)
-        print(request.form)
-        print(text_news, search_people_query,name_track)
         if name_track:
             processing_search_music(name_track=name_track, authorized_user=authorized_user, db_sess=db_sess)
         if search_people_query:
@@ -338,7 +336,7 @@ def load_user(user_id):
 def reviews():
     if not current_user.is_authenticated:
         return redirect('/login')
-    
+
     autoplay = ""
     found_people = ""
 
@@ -442,7 +440,6 @@ def get_chats(authorized_user):
     chats = db_sess.query(Chats.name, Chats.members, Chats.id)\
         .filter(or_(Chats.members.like(f'% {authorized_user.id},%'), Chats.members.like(f'{authorized_user.id},%'),
                     Chats.members.like(f'% {authorized_user.id}'))).all()
-    print(chats)
     ready_chats = []
 
     for chat in chats:
