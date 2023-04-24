@@ -23,7 +23,7 @@ class M3U8Downloader:
         except vk_api.exceptions.Captcha as captcha:
             print(captcha.sid) # Получение sid
             print(captcha.get_url()) # Получить ссылку на изображение капчи
-            raise vk_erorr
+            raise vk_error
 
         self._vk_audio = VkAudio(self._vk_session)
 
