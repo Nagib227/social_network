@@ -1,9 +1,0 @@
-.input_and_btn {
-  display: inline-flex;
-  width: 100%;
-}
-
-.input_and_btn textarea {
-  min-height: 90px;
-  max-height: 90px;
-}
